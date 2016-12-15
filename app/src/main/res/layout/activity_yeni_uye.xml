@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:text="@string/strAdSoyad"
+            android:id="@+id/textView" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:text="@string/strEposta"
+            android:id="@+id/textView2" />
+
+        <EditText
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText2"
+            android:layout_weight="0.40"
+            android:layout_gravity="right" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:text="@string/strKulAd"
+            android:id="@+id/textView3" />
+
+        <EditText
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText3"
+            android:layout_weight="0.42"
+            android:layout_gravity="right" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:text="@string/sifre"
+            android:id="@+id/textView4" />
+
+        <EditText
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText4"
+            android:layout_weight="0.49"
+            android:layout_gravity="right" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:text="@string/strSifreTekrar"
+            android:id="@+id/textView5" />
+
+        <EditText
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText5"
+            android:layout_weight="0.43"
+            android:layout_gravity="right" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingTop="20dp">
+
+        <Button
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:text="@string/strUyeOl"
+            android:id="@+id/button" />
+
+        <Button
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:text="@string/vazgec"
+            android:id="@+id/button2" />
+    </LinearLayout>
+</LinearLayout>

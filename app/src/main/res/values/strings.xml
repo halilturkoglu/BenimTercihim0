@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Benim Tercihim</string>
+    <string name="yeniuye">Yeni Üye</string>
+    <string name="sifrehatirla">Şifremi Unuttum</string>
+    <string name="kullaniciadi">Kullanıcı Adı</string>
+    <string name="sifre">Şifre</string>
+    <string name="uyesizdevam">Üye Olmadan Devam Et</string>
+    <string name="eskisifre">Şu Anki Şifreniz</string>
+    <string name="yenisifre1">Yeni Şifrenizi Giriniz</string>
+    <string name="yesnisifre2">Yeni Şifrenizi Tekrar Giriniz</string>
+    <string name="sifredegistir">Şifremi Değiştir</string>
+    <string name="vazgec">Vazgeç</string>
+    <string name="strAdSoyad">Adı Soyadı</string>
+    <string name="strEposta">E-Posta Adresi</string>
+    <string name="strKulAd">Kullanıcı Adı</string>
+    <string name="strSifreTekrar">Şifre Tekrar</string>
+    <string name="strUyeOl">Üye Ol</string>
+    <string name="btnUniDegerlendir">Üniversiteni Değerlendir</string>
+    <string name="btnSifreDegistir">Şifre Değiştir</string>
+    <string name="btnSorgu">Üniversite Sorgula</string>
+    <string name="btnUyelikSil">Üyeliğimi Sil</string>
+</resources>

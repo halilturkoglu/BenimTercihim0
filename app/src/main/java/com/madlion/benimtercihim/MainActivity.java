@@ -5,6 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.net.URI;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +49,19 @@ public class MainActivity extends AppCompatActivity {
         giris.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                EditText k=(EditText) findViewById(R.id.kullanici);
+                EditText s=(EditText) findViewById(R.id.sifre);
+                URI u=Genel_Islemler.adresyaz("islem=giris&kullanici="+k.getText().toString()+"&sifre="+s.getText().toString());
+                String c=Genel_Islemler.getWebPage(u.toString(),getBaseContext());
+                if(c.contains("success"))
+                {
+                    Intent i=new Intent(MainActivity.this,UyeSayfasi.class);
+                    startActivity(i);
+                }
+                else
+                {
+                    Toast.makeText(getBaseContext(),getString(R.string.oturumacmahata),Toast.LENGTH_LONG).show();
+                }
             }
         });
 

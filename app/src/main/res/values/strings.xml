@@ -45,4 +45,5 @@
     <string name="strPDF">PDF İndir</string>
     <string name="sifresifirlamesajbasari">Şifre sıfırlama bilgileri e-posta adresinize gönderilmiştir.</string>
     <string name="sifresifirlamesajhata">Şifre sıfırlama bilgileri e-posta adresinize gönderililirken hata oluştu. Daha sonra tekrar deneyiniz.</string>
+    <string name="oturumacmahata">Oturum açılamadı. Kullanıcı adı ve/veya şifreniz hatalı olabilir.</string>
 </resources>

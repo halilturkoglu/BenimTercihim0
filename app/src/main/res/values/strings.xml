@@ -43,4 +43,6 @@
     <string name="strGeri">Geri</string>
     <string name="strCikis">Çıkış</string>
     <string name="strPDF">PDF İndir</string>
+    <string name="sifresifirlamesajbasari">Şifre sıfırlama bilgileri e-posta adresinize gönderilmiştir.</string>
+    <string name="sifresifirlamesajhata">Şifre sıfırlama bilgileri e-posta adresinize gönderililirken hata oluştu. Daha sonra tekrar deneyiniz.</string>
 </resources>

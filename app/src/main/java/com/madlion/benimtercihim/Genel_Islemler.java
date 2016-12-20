@@ -25,6 +25,13 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class Genel_Islemler {
+	public static String siteadresi="http://192.168.1.47/deneme/";
+
+	public static URI adresyaz(String parametre)
+	{
+		URI u=URI.create(siteadresi+"?"+parametre);
+		return u;
+	}
 	
 	public static int getVersion(Context cnt)
 		{

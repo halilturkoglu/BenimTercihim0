@@ -12,10 +12,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button yeniuye, devam, sifrehatirla;
+
+        Button yeniuye, devam, sifrehatirla, giris;
+
         yeniuye=(Button) findViewById(R.id.yeniuye);
         devam=(Button) findViewById(R.id.devamet);
         sifrehatirla=(Button) findViewById(R.id.sifrehatirla);
+        giris=(Button) findViewById(R.id.btn_giris);
 
         yeniuye.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i=new Intent(MainActivity.this,SifreHatirlat.class);
                 startActivity(i);
+            }
+        });
+        giris.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

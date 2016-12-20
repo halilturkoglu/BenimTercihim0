@@ -19,4 +19,23 @@
     <string name="btnSifreDegistir">Şifre Değiştir</string>
     <string name="btnSorgu">Üniversite Sorgula</string>
     <string name="btnUyelikSil">Üyeliğimi Sil</string>
+    <string name="str_giris">Giriş Yap</string>
+    <string name="strPuan">Puan Türü</string>
+    <string name="strMin">En Küçük</string>
+    <string name="strMak">En Yüksek</string>
+    <string name="strPuanAraligi">Puan Aralığı</string>
+    <string name="strKira">Şehirde Kira Ücretleri Nasıl?</string>
+    <string name="strOzelYurt">Özel Yurt Ücretleri Nasıl?</string>
+    <string name="strYemek">Lokanta Ücretleri Nasıl?</string>
+    <string name="strAlisVeris">Alış Veriş İmkanları Nasıl?</string>
+    <string name="strSehirSosyal">Şehrin Sosyal İmkanları Nasıl?</string>
+    <string name="strUniSosyal">Üniversitenin Sosyal İmkanları Nasıl?</string>
+    <string name="strIsImkani">Mezun Olunca İş İmkanları Nasıl?</string>
+    <string name="strUlasim">Ulaşım Rahatlığı</string>
+    <string name="strGuvenlik">Güvenlik</string>
+    <string name="strSorgula">Sorgula</string>
+    <string name="strSehir">Şehir</string>
+    <string name="strUni">Üniversite</string>
+    <string name="strBolum">Bölüm</string>
+    <string name="strDegerlendir">Değerlendir</string>
 </resources>

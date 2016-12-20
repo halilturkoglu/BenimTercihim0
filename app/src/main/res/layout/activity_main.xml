@@ -25,6 +25,19 @@
         android:hint="@string/sifre"
         android:layout_marginTop="30dp" />
 
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_giris"
+        android:id="@+id/btn_giris" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/uyesizdevam"
+        android:id="@+id/devamet"
+        android:layout_marginTop="30dp" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -44,12 +57,5 @@
             android:text="@string/sifrehatirla"
             android:id="@+id/sifrehatirla" />
     </LinearLayout>
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/uyesizdevam"
-        android:id="@+id/devamet"
-        android:layout_marginTop="30dp" />
 
 </LinearLayout>

@@ -38,4 +38,9 @@
     <string name="strUni">Üniversite</string>
     <string name="strBolum">Bölüm</string>
     <string name="strDegerlendir">Değerlendir</string>
+    <string name="strEpostaGir">E-posta Adresinizi Girin</string>
+    <string name="strSifreSifirla">Şifremi Sıfırla</string>
+    <string name="strGeri">Geri</string>
+    <string name="strCikis">Çıkış</string>
+    <string name="strPDF">PDF İndir</string>
 </resources>

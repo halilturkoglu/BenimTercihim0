@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_dark"
+    android:background="#f44336"
     tools:context="com.madlion.benimtercihim.MainActivity"
     android:orientation="vertical">
 
@@ -18,7 +18,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/icons"
+        android:background="#f45347"
         android:textColor="@color/primary_light"
         android:id="@+id/kullanici"
         android:hint="@string/kullaniciadi"
@@ -33,10 +33,10 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:textColor="@color/primary_light"
-        android:background="@color/icons"
+        android:background="#f45347"
         android:id="@+id/sifre"
         android:hint="@string/sifre"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:textColorHint="@color/primary_light"
         android:password="true" />
 
@@ -45,11 +45,11 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-
+        android:textColor="@color/primary_light"
         android:text="@string/str_giris"
         android:id="@+id/btn_giris"
         android:background="@drawable/androidbuttonshapes"
-        android:layout_marginTop="60dp" />
+        android:layout_marginTop="30dp" />
 
     <Button
         android:layout_width="fill_parent"
@@ -71,8 +71,9 @@
         android:gravity="center_horizontal">
 
         <Button
-            android:layout_width="175dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
             android:textColor="@color/primary_light"
             android:text="@string/yeniuye"
             android:id="@+id/yeniuye"
@@ -80,7 +81,8 @@
              />
 
         <Button
-            android:layout_width="175dp"
+            android:layout_width="150dp"
+            android:layout_marginLeft="10dp"
             android:layout_height="wrap_content"
             android:textColor="@color/primary_light"
             android:text="@string/sifrehatirla"

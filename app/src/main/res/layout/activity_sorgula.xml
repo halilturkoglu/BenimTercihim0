@@ -7,6 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#f44336"
     tools:context="com.madlion.benimtercihim.Sorgula"
     android:orientation="vertical">
 
@@ -79,30 +80,33 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strKira"
                 android:id="@+id/textView10" />
 
             <RatingBar
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtKira" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strOzelYurt"
                 android:id="@+id/textView11" />
 
             <RatingBar
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtYurt" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strYemek"
                 android:id="@+id/textView12" />
@@ -110,10 +114,11 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtYemek" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strAlisVeris"
                 android:id="@+id/textView13" />
@@ -121,10 +126,11 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtAlisVeris" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strSehirSosyal"
                 android:id="@+id/textView14" />
@@ -132,10 +138,11 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtSehirSosyal" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strUniSosyal"
                 android:id="@+id/textView15" />
@@ -143,10 +150,11 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtUniSosyal" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strIsImkani"
                 android:id="@+id/textView16" />
@@ -154,10 +162,11 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtIsImkani" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/strUlasim"
                 android:id="@+id/textView17" />
@@ -165,17 +174,20 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtUlasim" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/textview_color"
                 android:text="@string/strGuvenlik"
                 android:id="@+id/textView18" />
 
             <RatingBar
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:progressTint="@color/primary_light"
                 android:id="@+id/rtGuvenlik" />
         </LinearLayout>
     </ScrollView>

@@ -8,8 +8,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,19 +57,47 @@ public class MainActivity extends AppCompatActivity {
         giris.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText k=(EditText) findViewById(R.id.kullanici);
-                EditText s=(EditText) findViewById(R.id.sifre);
-                URI u=Genel_Islemler.adresyaz("islem=giris&kullanici="+k.getText().toString()+"&sifre="+s.getText().toString());
-                String c=Genel_Islemler.getWebPage(u.toString(),getBaseContext());
-                if(c.contains("success"))
-                {
-                    Intent i=new Intent(MainActivity.this,UyeSayfasi.class);
-                    startActivity(i);
-                }
-                else
-                {
-                    Toast.makeText(getBaseContext(),getString(R.string.oturumacmahata),Toast.LENGTH_LONG).show();
-                }
+                final EditText k=(EditText) findViewById(R.id.kullanici);
+                final EditText s=(EditText) findViewById(R.id.sifre);
+
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"giris.php",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // Sonuç geldiğinde burada mesaj verilecek
+                                Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+response,Toast.LENGTH_LONG).show();
+                                if(response.contains("success"))
+                                {
+                                    //
+                                    //
+                                    //Oturum Açıldı
+                                    //
+                                    //eğer sonuç olumlu ise üye sayfasına geç.
+                                    Intent i=new Intent(MainActivity.this,UyeSayfasi.class);
+                                    i.putExtra("kullanici", k.getText().toString());
+                                    startActivity(i);
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //
+                        //
+                        //Oturum Açılamadı
+                        //
+                        //hata oluşursa mesaj burada verilecek
+                        Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+error.getMessage(),Toast.LENGTH_LONG).show();
+
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("kullanci_adi", k.getText().toString());
+                        params.put("sifre", s.getText().toString());
+                        return params;
+                    }
+                };
             }
         });
 

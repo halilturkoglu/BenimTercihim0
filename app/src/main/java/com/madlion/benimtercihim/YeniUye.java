@@ -44,8 +44,7 @@ public class YeniUye extends Activity {
                                 if(response.contains("success"))
                                 {
                                     //eğer sonuç olumlu ise anasayfaya geri dön.
-                                    Intent i=new Intent(YeniUye.this,MainActivity.class);
-                                    startActivity(i);
+                                    finish();
                                 }
                             }
                         }, new Response.ErrorListener() {

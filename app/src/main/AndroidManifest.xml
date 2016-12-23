@@ -21,11 +21,9 @@
         <activity android:name=".SifreDegistir" />
         <activity android:name=".Sorgula" />
         <activity android:name=".SorguRapor" />
-        <activity android:name=".SifreHatirlat"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+        <activity android:name=".YeniUye" />
+        <activity android:name=".SifreHatirlat" />
+        <activity android:name=".SifreHatirlat"></activity>
     </application>
 
 </manifest>

@@ -33,7 +33,10 @@ public class MainActivity extends AppCompatActivity {
         sifrehatirla=(Button) findViewById(R.id.sifrehatirla);
         giris=(Button) findViewById(R.id.btn_giris);
 
-        yeniuye.setOnClickListener(new View.OnClickListener() {
+
+
+
+           yeniuye.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i=new Intent(MainActivity.this,YeniUye.class);

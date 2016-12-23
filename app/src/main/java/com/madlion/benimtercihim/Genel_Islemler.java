@@ -25,8 +25,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class Genel_Islemler {
-	public static String siteadresi="http://176.217.115.206/deneme/";
-
+	//ev bağlantı
+	//public static String siteadresi="http://176.217.115.206/deneme/";
+	//işyeri bağlantı
+	public static String siteadresi="http://192.168.63.136/deneme/";
 	public static URI adresyaz(String parametre)
 	{
 		URI u=URI.create(siteadresi+"?"+parametre);

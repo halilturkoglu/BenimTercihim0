@@ -23,7 +23,7 @@
         <activity android:name=".SorguRapor" />
         <activity android:name=".YeniUye" />
         <activity android:name=".SifreHatirlat" />
-        <activity android:name=".SifreHatirlat"></activity>
+
     </application>
 
 </manifest>

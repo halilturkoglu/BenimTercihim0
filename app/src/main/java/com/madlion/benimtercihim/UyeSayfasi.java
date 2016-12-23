@@ -15,6 +15,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +80,23 @@ public class UyeSayfasi extends AppCompatActivity {
                                             //Kullanıcı Silindi
                                             //
                                             //Uygulama anasayfasına geç
+                                            try {
+                                                JSONArray jsonArray = new JSONArray(response);
+                                                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                                                String code = jsonObject.getString("code");
+                                                String message = jsonObject.getString("message");
+                                                if(code.equals("success"))
+                                                {
+                                                    Toast.makeText(getBaseContext(),"Üyelik Silme işlemi başarıyla tamamlandı.",Toast.LENGTH_LONG).show();
+                                                }
+                                                else
+                                                {
+                                                    Toast.makeText(getBaseContext(),"Üyelik Silme İşlemi başarısız oldu. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+                                                }
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
                                             finish();
                                         }
                                     }

@@ -13,6 +13,10 @@ import com.android.volley.*;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +48,24 @@ public class YeniUye extends Activity {
                                 if(response.contains("success"))
                                 {
                                     //eğer sonuç olumlu ise anasayfaya geri dön.
+                                    try {
+                                        JSONArray jsonArray = new JSONArray(response);
+                                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                                        String code = jsonObject.getString("code");
+                                        String message = jsonObject.getString("message");
+                                        if(code.equals("success"))
+                                        {
+                                            Toast.makeText(getBaseContext(),"Kayıt İşlemi başarıyla tamamlandı. Şimdi oturum açabilirsiniz.",Toast.LENGTH_LONG).show();
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(getBaseContext(),"Kayıt İşlemi başarısız oldu. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+                                        }
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
                                     finish();
                                 }
                             }

@@ -181,7 +181,6 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/textview_color"
                 android:text="@string/strGuvenlik"
                 android:id="@+id/textView18" />
 

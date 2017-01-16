@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.JsonReader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.*;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -31,7 +34,7 @@ public class YeniUye extends Activity {
         setContentView(R.layout.activity_yeni_uye);
 
         final RequestQueue queue = Volley.newRequestQueue(getBaseContext());
-        final String url=Genel_Islemler.siteadresi+"kayit.php";
+        final String url=Genel_Islemler.siteadresi+"kayit?xml=1";
 
         Button btnUye=(Button) findViewById(R.id.btnUyeOl);
         btnUye.setOnClickListener(new View.OnClickListener() {
@@ -44,18 +47,54 @@ public class YeniUye extends Activity {
                             public void onResponse(String response) {
                                 // Display the first 500 characters of the response string.
                                 // Sonuç geldiğinde burada mesaj verilecek
-                                Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+response,Toast.LENGTH_LONG).show();
-                                if(response.contains("success"))
+                                Log.i(ArkaplanIsleri.TAG_Response,response);
+
+                                if(response!=null)
                                 {
+                                    /*
+                                    *
+                                    * XML Sonuç Dönerse
+                                    *
+                                    * adres satırının sonuna ?xml=1 yazarak XML sonuç almayı başardım.
+                                    *
+                                    * ve bu sonucu XMLParse ile okuyarak, istediğim sonucu elde edebildim.
+                                     */
+                                    XMLParse x=new XMLParse(response, XMLParse.XMLType.StringVar);
+                                    if(x.getElementValue("sunucu_cevabi/0/code").equals("kayit_basarili")) {
+                                        Log.i(ArkaplanIsleri.TAG_Response, "Kayıt Başarılı");
+                                        Intent i=new Intent(YeniUye.this,MainActivity.class);
+                                        i.putExtra("kullanici",((EditText)findViewById(R.id.edtKullanici)).getText().toString());
+                                        i.putExtra("sifre",((EditText)findViewById(R.id.edtSifre1)).getText().toString());
+                                        setResult(1002,i);
+                                        finishActivity(1001);
+                                    }
+                                    else {
+                                        Log.i(ArkaplanIsleri.TAG_Response, "Kayıt Başarısız");
+                                        Toast.makeText(getBaseContext(),"Kayıt İşlemi başarısız oldu. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+                                    }
+                                    /*
+                                    *
+                                    *
+                                    *
+                                    * JSON Sonuç dönerse, ki döndü ama ben JSONArray a çeviremedim :D
+                                    *
+                                    *
+                                    *
                                     //eğer sonuç olumlu ise anasayfaya geri dön.
                                     try {
-                                        JSONArray jsonArray = new JSONArray(response);
+                                        JSONObject object = new JSONObject(response);
+                                        JSONArray jsonArray = object.getJSONArray("sunucu_cevabi"); //ahanda burada hata verdi
                                         JSONObject jsonObject = jsonArray.getJSONObject(0);
                                         String code = jsonObject.getString("code");
                                         String message = jsonObject.getString("message");
-                                        if(code.equals("success"))
+                                        if(code.equals("kayit_basarili"))
                                         {
                                             Toast.makeText(getBaseContext(),"Kayıt İşlemi başarıyla tamamlandı. Şimdi oturum açabilirsiniz.",Toast.LENGTH_LONG).show();
+                                            Intent i=new Intent(YeniUye.this,MainActivity.class);
+                                            i.putExtra("kullanici",((EditText)findViewById(R.id.edtKullanici)).getText().toString());
+                                            i.putExtra("sifre",((EditText)findViewById(R.id.edtSifre1)).getText().toString());
+                                            setResult(1002,i);
+                                            finishActivity(1001);
                                         }
                                         else
                                         {
@@ -65,7 +104,7 @@ public class YeniUye extends Activity {
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-
+*/
                                     finish();
                                 }
                             }
@@ -73,7 +112,7 @@ public class YeniUye extends Activity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //hata oluşursa mesaj burada verilecek
-                        Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+error.getMessage(),Toast.LENGTH_LONG).show();
+                        Log.i(ArkaplanIsleri.TAG_Response,error.getMessage().isEmpty()?url:error.getMessage());
 
                     }
                 }) {

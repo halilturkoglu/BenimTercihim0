@@ -11,6 +11,14 @@
     android:background="#f44336"
     android:orientation="vertical">
 
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView33"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textAlignment="center" />
+
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

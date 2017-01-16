@@ -23,7 +23,7 @@
         android:layout_alignParentStart="true"
         android:textAlignment="center" />
 
-    <ListView
+    <com.madlion.benimtercihim.BolumListesi
         android:layout_width="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

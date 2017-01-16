@@ -5,7 +5,9 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
@@ -44,6 +46,16 @@ public class Sorgula extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sorgula);
         Button btnSorgula;
+        ArrayList<String> puan=new ArrayList<String>();
+        puan.add("MF-1");
+        puan.add("TM-1");
+        puan.add("MF-2");
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                puan );
+        ((Spinner) findViewById(R.id.spnPuan)).setAdapter(arrayAdapter);
+
 
         btnSorgula = (Button) findViewById(R.id.btnSorgula);
         btnSorgula.setOnClickListener(new View.OnClickListener() {
@@ -66,9 +78,44 @@ public class Sorgula extends AppCompatActivity {
                 rtUlasim = ((RatingBar) findViewById(R.id.rtUlasim)).getRating();
                 rtGuvenlik = ((RatingBar) findViewById(R.id.rtGuvenlik)).getRating();
 
-                spnPuan = ((TextView) ((Spinner) findViewById(R.id.spnPuan)).getChildAt(((Spinner) findViewById(R.id.spnPuan)).getSelectedItemPosition()).findViewById(R.id.textView)).getText().toString();
+                Log.i("Yapılanİşlem","Sorgula düğmesine basıldı");
 
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi + "unisorgula.php",
+                spnPuan = ((Spinner) findViewById(R.id.spnPuan)).getSelectedItem().toString();
+
+                String[] params=new String[23];
+                params[0]=Genel_Islemler.siteadresi + "sorgula";
+                params[1]="bolumpuan"; params[2]= "BETWEEN "+edtMin + " AND " + edtMak;
+                params[3]="sehirkira"; params[4]= String.valueOf(rtKira);
+                params[5]="sehiryurt"; params[6]= String.valueOf(rtYurt);
+                params[7]="sehiryemek"; params[8]= String.valueOf(rtYemek);
+                params[9]="sehiralisveris"; params[10]= String.valueOf(rtAlisVeris);
+                params[11]="sehirsosyal"; params[12]= String.valueOf(rtSehirSosyal);
+                params[13]="unisosyal"; params[14]= String.valueOf(rtUniSosyal);
+                params[15]="bolumisimkani"; params[16]= String.valueOf(rtIsImkani);
+                params[17]="sehirulasim"; params[18]= String.valueOf(rtUlasim);
+                params[19]="sehirguvenlik"; params[20]= String.valueOf(rtGuvenlik);
+                params[21]="bolumpuanturu"; params[22]= spnPuan;
+
+                ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),Sorgula.this);
+                String r=ai.getResponseFrom(params, ArkaplanIsleri.RequestType.POST);
+
+                XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
+                if(x.getElementCount("bolum")>0)
+                {
+                    ArrayList<String> bolum=new ArrayList<String>();
+                    for(int i=0;i<x.getElementCount("bolum");i++)
+                    {
+                        Log.i(ArkaplanIsleri.TAG_Job,x.getElementValue("bolumler/"+String.valueOf(i)+"/bolum/0/bolumid"));
+                        bolum.add(Integer.parseInt(x.getElementValue("bolumler/"+String.valueOf(i)+"/bolum/0/bolumid")),x.getElementValue("bolumler/"+String.valueOf(i)+"/bolum/0/bolumadi"));
+                    }
+                    Log.i(ArkaplanIsleri.TAG_Response,"Sorgu Sonucu Kayıt Sayısı:"+String.valueOf(bolum.size()));
+                    Intent i = new Intent(Sorgula.this, SorguRapor.class);
+                    i.putStringArrayListExtra("liste",bolum);
+                    startActivity(i);
+
+                }
+/*
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi + "/sorgula",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -85,8 +132,7 @@ public class Sorgula extends AppCompatActivity {
                                     //
                                     // putextra ile activity ler arası veri transferi mümkün ama
                                     // bütün bir bölüm üniversite listesini nasıl göndereceğiz
-
-
+                                    Log.i("Yapılanİşlem","sorgulama sonucu alındı");
                                     ArrayList<String> sonuclar=null;
                                     try {
                                         JSONArray jsonArray = new JSONArray(response);
@@ -121,7 +167,7 @@ public class Sorgula extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         //hata oluşursa mesaj burada verilecek
                         Toast.makeText(getBaseContext(), "İstek gönderildi. Gelen sonuç : " + error.getMessage(), Toast.LENGTH_LONG).show();
-
+                        Log.i("Yapılanİşlem","sorgulama sonucu alınamadı");
                     }
                 }) {
                     @Override
@@ -131,17 +177,17 @@ public class Sorgula extends AppCompatActivity {
                         //PHP kanadında SQL kodu oluşturulacak ve
                         //sorgulama sonucunda elde edilen veriler geri döndürülecek.
                         Map<String, String> params = new HashMap<String, String>();
-                        params.put("bolum.puan", edtMin + ":" + edtMak);
-                        params.put("sehir.kira", String.valueOf(rtKira));
-                        params.put("sehir.yurt", String.valueOf(rtYurt));
-                        params.put("sehir.yemek", String.valueOf(rtYemek));
-                        params.put("sehir.alisveris", String.valueOf(rtAlisVeris));
-                        params.put("sehir.sosyal", String.valueOf(rtSehirSosyal));
-                        params.put("uni.sosyal", String.valueOf(rtUniSosyal));
-                        params.put("bolum.isimkani", String.valueOf(rtIsImkani));
-                        params.put("sehir.ulasim", String.valueOf(rtUlasim));
-                        params.put("sehir.guvenlik", String.valueOf(rtGuvenlik));
-                        params.put("bolum.puanturu", spnPuan);
+                        params.put("bolumpuan", edtMin + ":" + edtMak);
+                        params.put("sehirkira", String.valueOf(rtKira));
+                        params.put("sehiryurt", String.valueOf(rtYurt));
+                        params.put("sehiryemek", String.valueOf(rtYemek));
+                        params.put("sehiralisveris", String.valueOf(rtAlisVeris));
+                        params.put("sehirsosyal", String.valueOf(rtSehirSosyal));
+                        params.put("unisosyal", String.valueOf(rtUniSosyal));
+                        params.put("bolumisimkani", String.valueOf(rtIsImkani));
+                        params.put("sehirulasim", String.valueOf(rtUlasim));
+                        params.put("sehirguvenlik", String.valueOf(rtGuvenlik));
+                        params.put("bolumpuanturu", spnPuan);
                         return params;
 
                         /*
@@ -158,10 +204,11 @@ public class Sorgula extends AppCompatActivity {
                                 +" and sehir.guvenlik>="+rtGuvenlik
                                 +" and bolum.puanturu='"+spnPuan+"'"
                                 +"";
-                                */
+                                * /
 
                     }
                 };
+                */
 
             }
         });

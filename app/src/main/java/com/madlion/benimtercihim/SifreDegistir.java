@@ -3,6 +3,7 @@ package com.madlion.benimtercihim;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,9 +26,9 @@ public class SifreDegistir extends AppCompatActivity {
         setContentView(R.layout.activity_sifre_degistir);
         final String kullanici;
 
-        if(!savedInstanceState.isEmpty())
+        if(getIntent().hasExtra("kullanici"))
         {
-            kullanici=savedInstanceState.getString("kullanici");
+            kullanici=getIntent().getExtras().getString("kullanici");
             final EditText es,ys1,ys2;
             Button btnSifreDegistir = (Button) findViewById(R.id.btnSifreDegistir);
             Button vazgec = (Button) findViewById(R.id.vazgec);
@@ -57,14 +58,20 @@ public class SifreDegistir extends AppCompatActivity {
                                         if(response.contains("success"))
                                         {
                                             //eğer sonuç olumlu ise uye sayfasına geri dön.
+                                            Log.i("Yapılanİşlem","Şifre değiştirildi");
+
                                             finish();
                                         }
+                                        else
+                                            Log.i("Yapılanİşlem","şifre değiştilemedi");
+
                                     }
                                 }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 //hata oluşursa mesaj burada verilecek
                                 Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+error.getMessage(),Toast.LENGTH_LONG).show();
+                                Log.i("Yapılanİşlem","Şifre değiştirmede hata");
 
                             }
                         }) {

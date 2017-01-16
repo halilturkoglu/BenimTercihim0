@@ -52,6 +52,7 @@ public class UniDegerlendir extends AppCompatActivity {
             JSONArray liste = new JSONObject(r).getJSONArray("sehirler");
             Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
             ArrayList<String> shr=new ArrayList<String>(liste.length());
+            shr.add("Seçiniz");
             JSONObject x;
             if(liste.length()>0)
             {
@@ -62,7 +63,7 @@ public class UniDegerlendir extends AppCompatActivity {
                     x=liste.getJSONObject(i);
                     plaka=x.getInt("plaka");
                     sehir=x.getString("sehir");
-                    shr.add(plaka,sehir);
+                    shr.add(String.valueOf(plaka)+"-"+sehir);
                 }
                 ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
                 spnSehir.setAdapter(shr_adp);
@@ -91,37 +92,22 @@ public class UniDegerlendir extends AppCompatActivity {
         spnSehir.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(final AdapterView<?> parent, View view, final int position, long id) {
-                if(position>-1)
+                if(position>0)
                 {
                     Toast.makeText(getBaseContext(),String.valueOf(position),Toast.LENGTH_LONG).show();
                     String[] params = new String[1];
-                    params[0]=Genel_Islemler.siteadresi+"universiteler&sehirid="+position;
-                    //params[1]="sehir";
-                    //params[2]=((TextView)((View) parent.getSelectedItem()).findViewById(R.id.textView)).getText().toString();
+                    //seçilen elemanın metni "-" karakterine bölünüp oluşan dizinin ilk öğesi alınır (plaka)
+                    params[0]=Genel_Islemler.siteadresi+"universiteler&sehirid="+parent.getItemAtPosition(position).toString().split("-")[0];
+                    Log.i(ArkaplanIsleri.TAG_Job,parent.getItemAtPosition(position).toString());
 
                     Log.i("Şehir Seçimi","Başarılı");
                     ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
                     String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
-//                    XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
-//                    if(x.getElementCount("universite")>0)
-//                    {
-//                        // Üniversite listesi doldurulacak. Üniversite listesi r değişkeninin içinde yer alıyor.
-//                        ArrayList<String> uni=new ArrayList<String>();
-//                        for(int i=0;i<x.getElementCount("universite");i++)
-//                        {
-//                            Log.i(ArkaplanIsleri.TAG_Job,x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/universite_id"));
-//                            uni.add(Integer.parseInt(x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/universite_id")),x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/ad"));
-//                        }
-//                        ArrayAdapter<String> uni_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,uni);
-//                        spnUni.setAdapter(uni_adp);
-//
-//                    }
-//                    else
-//                        Log.i("Şehir Seçimi","Başarısız");
                     try {
                         JSONArray liste = new JSONObject(r).getJSONArray("universiteler");
                         Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
                         ArrayList<String> shr=new ArrayList<String>(liste.length());
+                        shr.add("Seçiniz");
                         JSONObject x;
                         if(liste.length()>0)
                         {
@@ -130,9 +116,9 @@ public class UniDegerlendir extends AppCompatActivity {
                             for(int i=0;i<liste.length();i++)
                             {
                                 x=liste.getJSONObject(i);
-                                uniid=x.getInt("plaka");
-                                uniadi=x.getString("sehir");
-                                shr.add(uniid,uniadi);
+                                uniid=x.getInt("universite_id");
+                                uniadi=x.getString("ad");
+                                shr.add(String.valueOf(uniid)+"-"+uniadi);
                             }
                             ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
                             spnUni.setAdapter(shr_adp);
@@ -155,29 +141,10 @@ public class UniDegerlendir extends AppCompatActivity {
             public void onItemSelected(final AdapterView<?> parent, View view, final int position, long id) {
                 if(position>-1)
                 {
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"bolumgetir.php",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    if(response.contains("success"))
-                                    {
-                                        //eğer sonuç olumlu ise bölüm listesini doldur..
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            //hata oluşursa mesaj burada verilecek
-                        }
-                    }) {
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("uni", ((TextView)((View) parent.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
-                            return params;
-                        }
-                    };
-
+                    String[] params = new String[1];
+                    //seçilen elemanın metni "-" karakterine bölünüp oluşan dizinin ilk öğesi alınır (plaka)
+                    params[0]=Genel_Islemler.siteadresi+"bolumler&universiteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
+                    Log.i(ArkaplanIsleri.TAG_Job,parent.getItemAtPosition(position).toString());
                 }
             }
             @Override

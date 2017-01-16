@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(ArkaplanIsleri.TAG_Job,"Oturum Açma girişimi");
 
                 String[] params = new String[6];
-                params[0]=Genel_Islemler.siteadresi+"giris?xml=1";
+                params[0]=Genel_Islemler.siteadresi+"giris";
                 params[1]="eposta";
                 params[2]=k.getText().toString();
                 params[3]="sifre";

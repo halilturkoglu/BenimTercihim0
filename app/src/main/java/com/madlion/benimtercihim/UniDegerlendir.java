@@ -20,6 +20,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,52 +46,104 @@ public class UniDegerlendir extends AppCompatActivity {
 
         ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
         String[] params = new String[1];
-        params[0]=Genel_Islemler.siteadresi+"sehirler?xml=1";
+        params[0]=Genel_Islemler.siteadresi+"sehirler";
         String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
-
-        XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
-        if(x.getElementCount("sehir")>0)
-        {
-            ArrayList<String> shr=new ArrayList<String>();
-            for(int i=0;i<x.getElementCount("sehir");i++)
+        try {
+            JSONArray liste = new JSONObject(r).getJSONArray("sehirler");
+            Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
+            ArrayList<String> shr=new ArrayList<String>(liste.length());
+            JSONObject x;
+            if(liste.length()>0)
             {
-                shr.add(Integer.parseInt(x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/plaka")),x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/sehir"));
+                Integer plaka=0;
+                String sehir="";
+                for(int i=0;i<liste.length();i++)
+                {
+                    x=liste.getJSONObject(i);
+                    plaka=x.getInt("plaka");
+                    sehir=x.getString("sehir");
+                    shr.add(plaka,sehir);
+                }
+                ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
+                spnSehir.setAdapter(shr_adp);
             }
-            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
-            spnSehir.setAdapter(shr_adp);
-
+            else
+            {
+                Toast.makeText(getBaseContext(),"Şehirler listesi alınamadı. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+//        XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
+//        if(x.getElementCount("sehir")>0)
+//        {
+//            ArrayList<String> shr=new ArrayList<String>();
+//            for(int i=0;i<x.getElementCount("sehir");i++)
+//            {
+//                shr.add(Integer.parseInt(x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/plaka")),x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/sehir"));
+//            }
+//            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
+//            spnSehir.setAdapter(shr_adp);
+//
+//        }
 
         spnSehir.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(final AdapterView<?> parent, View view, final int position, long id) {
                 if(position>-1)
                 {
-Toast.makeText(getBaseContext(),String.valueOf(position),Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(),String.valueOf(position),Toast.LENGTH_LONG).show();
                     String[] params = new String[1];
-                    params[0]=Genel_Islemler.siteadresi+"universiteler/"+(position+1)+"?xml=1";
+                    params[0]=Genel_Islemler.siteadresi+"universiteler&sehirid="+position;
                     //params[1]="sehir";
                     //params[2]=((TextView)((View) parent.getSelectedItem()).findViewById(R.id.textView)).getText().toString();
 
                     Log.i("Şehir Seçimi","Başarılı");
                     ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
                     String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
-                    XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
-                    if(x.getElementCount("universite")>0)
-                    {
-// Üniversite listesi doldurulacak. Üniversite listesi r değişkeninin içinde yer alıyor.
-                        ArrayList<String> uni=new ArrayList<String>();
-                        for(int i=0;i<x.getElementCount("universite");i++)
+//                    XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
+//                    if(x.getElementCount("universite")>0)
+//                    {
+//                        // Üniversite listesi doldurulacak. Üniversite listesi r değişkeninin içinde yer alıyor.
+//                        ArrayList<String> uni=new ArrayList<String>();
+//                        for(int i=0;i<x.getElementCount("universite");i++)
+//                        {
+//                            Log.i(ArkaplanIsleri.TAG_Job,x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/universite_id"));
+//                            uni.add(Integer.parseInt(x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/universite_id")),x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/ad"));
+//                        }
+//                        ArrayAdapter<String> uni_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,uni);
+//                        spnUni.setAdapter(uni_adp);
+//
+//                    }
+//                    else
+//                        Log.i("Şehir Seçimi","Başarısız");
+                    try {
+                        JSONArray liste = new JSONObject(r).getJSONArray("universiteler");
+                        Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
+                        ArrayList<String> shr=new ArrayList<String>(liste.length());
+                        JSONObject x;
+                        if(liste.length()>0)
                         {
-                            Log.i(ArkaplanIsleri.TAG_Job,x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/universite_id"));
-                            uni.add(Integer.parseInt(x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/universite_id")),x.getElementValue("universiteler/"+String.valueOf(i)+"/universite/0/ad"));
+                            Integer uniid=0;
+                            String uniadi="";
+                            for(int i=0;i<liste.length();i++)
+                            {
+                                x=liste.getJSONObject(i);
+                                uniid=x.getInt("plaka");
+                                uniadi=x.getString("sehir");
+                                shr.add(uniid,uniadi);
+                            }
+                            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
+                            spnUni.setAdapter(shr_adp);
                         }
-                        ArrayAdapter<String> uni_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,uni);
-                        spnUni.setAdapter(uni_adp);
-
+                        else
+                        {
+                            Toast.makeText(getBaseContext(),"Üniversite listesi alınamadı. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                    else
-                        Log.i("Şehir Seçimi","Başarısız");
                 }
             }
             @Override
@@ -165,17 +221,17 @@ Toast.makeText(getBaseContext(),String.valueOf(position),Toast.LENGTH_LONG).show
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> params = new HashMap<String, String>();
-                        params.put("uni.adi", ((TextView)((View) spnUni.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
-                        params.put("sehir.kira", String.valueOf(rtKira));
-                        params.put("sehir.yurt", String.valueOf(rtYurt));
-                        params.put("sehir.yemek", String.valueOf(rtYemek));
-                        params.put("sehir.alisveris", String.valueOf(rtAlisVeris));
-                        params.put("sehir.sosyal", String.valueOf(rtSehirSosyal));
-                        params.put("uni.sosyal", String.valueOf(rtUniSosyal));
-                        params.put("bolum.isimkani", String.valueOf(rtIsImkani));
-                        params.put("sehir.ulasim", String.valueOf(rtUlasim));
-                        params.put("sehir.guvenlik", String.valueOf(rtGuvenlik));
-                        params.put("bolum.adi", ((TextView)((View) spnBolum.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
+                        params.put("uniadi", ((TextView)((View) spnUni.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
+                        params.put("sehirkira", String.valueOf(rtKira));
+                        params.put("sehiryurt", String.valueOf(rtYurt));
+                        params.put("sehiryemek", String.valueOf(rtYemek));
+                        params.put("sehiralisveris", String.valueOf(rtAlisVeris));
+                        params.put("sehirsosyal", String.valueOf(rtSehirSosyal));
+                        params.put("unisosyal", String.valueOf(rtUniSosyal));
+                        params.put("bolumisimkani", String.valueOf(rtIsImkani));
+                        params.put("sehirulasim", String.valueOf(rtUlasim));
+                        params.put("sehirguvenlik", String.valueOf(rtGuvenlik));
+                        params.put("bolumadi", ((TextView)((View) spnBolum.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
                         return params;
                     }
                 };

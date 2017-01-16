@@ -38,7 +38,7 @@ public class Genel_Islemler extends AsyncTask<String,Void,String> {
 	//ev bağlantı
 	//public static String siteadresi="http://176.217.115.206/deneme/";
 	//işyeri bağlantı
-	public static String siteadresi="http://api.ademdeliaslan.com.tr/";
+	public static String siteadresi="http://halilturkoglu.com/adem.php?page=";//"http://api.ademdeliaslan.com.tr/";
 
 	public static URI adresyaz(String parametre)
 	{

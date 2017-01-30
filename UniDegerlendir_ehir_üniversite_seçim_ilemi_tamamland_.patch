@@ -1,0 +1,1677 @@
+Index: .idea/dictionaries/halilturkoglu.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/dictionaries/halilturkoglu.xml	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
++++ .idea/dictionaries/halilturkoglu.xml	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -0,0 +1,3 @@
++<component name="ProjectDictionaryState">
++  <dictionary name="halilturkoglu" />
++</component>
+\ No newline at end of file
+Index: app/src/main/java/com/madlion/benimtercihim/ArkaplanIsleri.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/ArkaplanIsleri.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
++++ app/src/main/java/com/madlion/benimtercihim/ArkaplanIsleri.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -0,0 +1,177 @@
++package com.madlion.benimtercihim;
++
++import android.app.Activity;
++import android.app.ProgressDialog;
++import android.content.Context;
++import android.content.DialogInterface;
++import android.content.Intent;
++import android.os.AsyncTask;
++import android.support.v7.app.AlertDialog;
++import android.util.Log;
++import android.widget.EditText;
++
++import org.json.JSONArray;
++import org.json.JSONException;
++import org.json.JSONObject;
++
++import java.io.BufferedReader;
++import java.io.BufferedWriter;
++import java.io.FileNotFoundException;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.InputStreamReader;
++import java.io.OutputStream;
++import java.io.OutputStreamWriter;
++import java.io.UnsupportedEncodingException;
++import java.net.HttpURLConnection;
++import java.net.MalformedURLException;
++import java.net.ProtocolException;
++import java.net.URL;
++import java.net.URLEncoder;
++
++public class ArkaplanIsleri extends AsyncTask<String,Void,String>{
++
++
++    Context context;
++    Activity href;
++    ProgressDialog progressDialog;
++    AlertDialog.Builder builder;
++    String response;
++    public static String TAG_Response="Gelen Cevap";
++    public static String TAG_Job="Yapılan İş";
++
++    public enum RequestType {
++        POST,
++        GET
++    }
++
++    public String getResponse()
++    {
++        return this.response;
++    }
++
++    public ArkaplanIsleri(Context context,Activity act){
++        this.context = context;
++        this.href=act;
++    }
++
++    @Override
++    protected void onPreExecute() {
++        //Progress Dialog Görünmüyor sebebini bilmiyorum
++        progressDialog = new ProgressDialog(href);
++        progressDialog.setTitle("Lütfen bekleyiniz");
++        progressDialog.setMessage("Sunucuya bağlanılıyor..");
++        progressDialog.setCancelable(false);
++        progressDialog.show();
++    }
++
++    public String getResponseFrom(String[] params, RequestType type) {
++        String[] x=new String[params.length+1];
++        x[0]=(type==RequestType.GET)?"GET":"POST";
++        for(int i=0;i<params.length;i++)
++            x[i+1]=params[i];
++        this.execute(x);
++        while(this.getResponse()==null)
++        {
++            try {
++                Thread.sleep(100);
++            } catch (InterruptedException e) {
++                e.printStackTrace();
++            }
++        }
++        Log.i(ArkaplanIsleri.TAG_Response,this.getResponse());
++        return this.getResponse();
++    }
++
++    @Override
++    protected String doInBackground(String ... params) {
++        Boolean isGet=params[0].equals("GET")?true:false;
++        //çağrılacak olan web sayfasının adresi
++        String urlm=params[1];
++
++            try {
++                // çağrılacak olan web sayfasona gönderilecek parametreler
++                String veri="";
++                for(int i=2;i<(params.length-1);i+=2)
++                {
++                    veri+=URLEncoder.encode(params[i],"UTF-8")+"="+URLEncoder.encode(params[i+1],"UTF-8");
++                    if((i+2)<(params.length-1)) veri+="&";
++                }
++
++                //eğer iletişim metodu GET ise parametreler adresin sonuna eklenecek
++                if(isGet)
++                {
++                    Log.i("Veri Oluşturma","Method GET olarak algılandı");
++                    if(!veri.isEmpty())
++                        urlm += params[1].contains("?")?"&":"?" + veri;
++                }
++
++                URL url = new URL(urlm);
++                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
++                httpURLConnection.setRequestMethod(params[0]);
++                httpURLConnection.setDoInput(true);
++                httpURLConnection.setDoOutput(true);
++
++
++                Log.i(ArkaplanIsleri.TAG_Job,params[0]);
++                Log.i(ArkaplanIsleri.TAG_Job,url.toString());
++                Log.i(ArkaplanIsleri.TAG_Job,veri);
++
++                if(!isGet)
++                {
++                    Log.i("Veri Oluşturma","Method POST olarak algılandı");
++                    OutputStream outputStream = httpURLConnection.getOutputStream();
++                    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream,"UTF-8"));
++                    bufferedWriter.write(veri);
++                    bufferedWriter.flush();
++                    bufferedWriter.close();
++                    outputStream.close();
++                }
++
++                Log.i(ArkaplanIsleri.TAG_Job,"HTTP "+String.valueOf(httpURLConnection.getResponseCode())+" : "+httpURLConnection.getResponseMessage());
++
++                InputStream inputStream = (InputStream) httpURLConnection.getContent();
++                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
++                StringBuilder stringBuilder = new StringBuilder();
++                String line = "";
++
++
++                while ((line=bufferedReader.readLine())!=null)
++                {
++                    stringBuilder.append(line+"\n");
++                }
++
++                httpURLConnection.disconnect();
++//                Thread.sleep(5000);
++
++                progressDialog.dismiss();
++                response=stringBuilder.toString().trim();
++                return response;
++            }
++            catch (MalformedURLException e){
++                e.printStackTrace();
++            } catch (FileNotFoundException e) {
++                e.printStackTrace();
++            } catch (IOException e) {
++                e.printStackTrace();
++            }
++    return null;
++    }
++
++    @Override
++    protected void onProgressUpdate(Void... values) {
++        super.onProgressUpdate(values);
++    }
++
++    @Override
++    public String toString() {
++        return response;
++    }
++
++    @Override
++    protected void onPostExecute(String json) {
++
++    }
++
++
++}
+Index: app/src/main/java/com/madlion/benimtercihim/Bolum.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/Bolum.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
++++ app/src/main/java/com/madlion/benimtercihim/Bolum.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -0,0 +1,120 @@
++package com.madlion.benimtercihim;
++
++/**
++ * Created by halilturkoglu on 23.12.2016.
++ */
++
++public class Bolum {
++
++    private String BolumAdi;
++    private String Universite;
++    private Float Puan;
++    private String PuanTuru;
++
++    private Float kira, yurt, yemek, alisveris, sehirsosyal, unisosyal, isimkani, ulasim, guvenlik;
++
++    public String getBolumAdi() {
++        return BolumAdi;
++    }
++
++    public void setBolumAdi(String bolumAdi) {
++        BolumAdi = bolumAdi;
++    }
++
++    public String getUniversite() {
++        return Universite;
++    }
++
++    public void setUniversite(String universite) {
++        Universite = universite;
++    }
++
++    public Float getPuan() {
++        return Puan;
++    }
++
++    public void setPuan(Float puan) {
++        Puan = puan;
++    }
++
++    public String getPuanTuru() {
++        return PuanTuru;
++    }
++
++    public void setPuanTuru(String puanTuru) {
++        PuanTuru = puanTuru;
++    }
++
++    public Float getKira() {
++        return kira;
++    }
++
++    public void setKira(Float kira) {
++        this.kira = kira;
++    }
++
++    public Float getYurt() {
++        return yurt;
++    }
++
++    public void setYurt(Float yurt) {
++        this.yurt = yurt;
++    }
++
++    public Float getYemek() {
++        return yemek;
++    }
++
++    public void setYemek(Float yemek) {
++        this.yemek = yemek;
++    }
++
++    public Float getAlisveris() {
++        return alisveris;
++    }
++
++    public void setAlisveris(Float alisveris) {
++        this.alisveris = alisveris;
++    }
++
++    public Float getSehirsosyal() {
++        return sehirsosyal;
++    }
++
++    public void setSehirsosyal(Float sehirsosyal) {
++        this.sehirsosyal = sehirsosyal;
++    }
++
++    public Float getUnisosyal() {
++        return unisosyal;
++    }
++
++    public void setUnisosyal(Float unisosyal) {
++        this.unisosyal = unisosyal;
++    }
++
++    public Float getIsimkani() {
++        return isimkani;
++    }
++
++    public void setIsimkani(Float isimkani) {
++        this.isimkani = isimkani;
++    }
++
++    public Float getUlasim() {
++        return ulasim;
++    }
++
++    public void setUlasim(Float ulasim) {
++        this.ulasim = ulasim;
++    }
++
++    public Float getGuvenlik() {
++        return guvenlik;
++    }
++
++    public void setGuvenlik(Float guvenlik) {
++        this.guvenlik = guvenlik;
++    }
++}
++
+Index: app/src/main/java/com/madlion/benimtercihim/BolumListesi.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/BolumListesi.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
++++ app/src/main/java/com/madlion/benimtercihim/BolumListesi.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -0,0 +1,87 @@
++package com.madlion.benimtercihim;
++
++import android.app.ProgressDialog;
++import android.content.Context;
++import android.util.AttributeSet;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ArrayAdapter;
++import android.widget.ListView;
++import android.widget.TextView;
++
++import java.util.ArrayList;
++
++/**
++ * Created by halilturkoglu on 23.12.2016.
++ */
++
++public class BolumListesi extends ListView {
++
++    public Context cont=null;
++    public BolumListesi(Context context) {
++        super(context);
++        init(context);
++        // TODO Auto-generated constructor stub
++    }
++
++    public BolumListesi(Context context, AttributeSet attrs) {
++        super(context, attrs);
++        init(context);
++    }
++
++    public BolumListesi(Context context, AttributeSet attrs, int defStyle) {
++        super(context, attrs, defStyle);
++        init(context);
++    }
++
++    private ArrayList<Bolum> bolumler = null;
++    private OrderAdapter m_adapter;
++    private void init(Context context) {
++        cont=context;
++    }
++
++    public Runnable returnRes = new Runnable() {
++
++        @Override
++        public void run() {
++            if(bolumler != null && bolumler.size() > 0){
++                for(int i=0;i<bolumler.size();i++)
++                    m_adapter.add(bolumler.get(i));
++            }
++        }
++    };
++
++    private class OrderAdapter extends ArrayAdapter<Bolum>
++    {
++        private ArrayList<Bolum> items;
++        public OrderAdapter(Context context, int textViewResourceId, ArrayList<Bolum> items)
++        {
++            super(context, textViewResourceId, items);
++            this.items = items;
++        }
++
++        @Override
++        public View getView(int position, View convertView, ViewGroup parent)
++        {
++            View v = convertView;
++            if (v == null)
++            {
++                LayoutInflater vi = (LayoutInflater) cont.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
++                v = vi.inflate(R.layout.listview_bolum, null);
++            }
++            Bolum o = items.get(position);
++            if (o != null)
++            {
++                TextView ad = (TextView) v.findViewById(R.id.BolumAdi);
++                TextView uni = (TextView) v.findViewById(R.id.Universite);
++                TextView puan = (TextView) v.findViewById(R.id.Puan);
++                if(ad != null) ad.setText(o.getBolumAdi());
++                if(uni != null) uni.setText(o.getUniversite());
++                if(puan != null) puan.setText(String.valueOf(o.getPuan()));
++            }
++            return v;
++        }
++    }
++}
++
+Index: app/src/main/java/com/madlion/benimtercihim/Genel_Islemler.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/Genel_Islemler.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/Genel_Islemler.java	(revision 0123643742c7d8390bb7e0d565f7d6f54af19932)
+@@ -8,27 +8,38 @@
+ import android.content.pm.PackageManager.NameNotFoundException;
+ import android.net.ConnectivityManager;
+ import android.net.Uri;
++import android.os.AsyncTask;
+ import android.os.Build;
+ import android.provider.Settings;
+ import android.telephony.TelephonyManager;
+ import android.util.Log;
+ 
++import java.io.BufferedReader;
++import java.io.BufferedWriter;
+ import java.io.File;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.InputStreamReader;
++import java.io.OutputStream;
++import java.io.OutputStreamWriter;
+ import java.io.Reader;
+ import java.lang.reflect.Method;
++import java.net.HttpURLConnection;
++import java.net.MalformedURLException;
+ import java.net.URI;
+ import java.net.URISyntaxException;
+ import java.net.URL;
+ import java.net.URLConnection;
++import java.net.URLEncoder;
++import java.util.ArrayList;
++import java.util.HashMap;
+ 
+-public class Genel_Islemler {
++public class Genel_Islemler extends AsyncTask<String,Void,String> {
+ 	//ev bağlantı
+ 	//public static String siteadresi="http://176.217.115.206/deneme/";
+ 	//işyeri bağlantı
+-	public static String siteadresi="http://192.168.63.136/deneme/";
++	public static String siteadresi="http://halilturkoglu.com/adem.php?page=";//"http://api.ademdeliaslan.com.tr/";
++
+ 	public static URI adresyaz(String parametre)
+ 	{
+ 		URI u=URI.create(siteadresi+"?"+parametre);
+@@ -104,4 +115,53 @@
+ 		return response;
+ 		}
+ 
++	@Override
++	protected String doInBackground(String... params) {
++		String urlm=params[0];
++		try{
++			URL url = new URL(urlm);
++			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
++			httpURLConnection.setRequestMethod("POST");
++			httpURLConnection.setDoOutput(true);
++			httpURLConnection.setDoInput(true);
++			OutputStream outputStream = httpURLConnection.getOutputStream();
++			BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream,"UTF-8"));
++			String veri="";
++			for(int i=1;i<params.length;i+=2)
++			{
++				veri+=URLEncoder.encode(params[i],"UTF-8")+"="+URLEncoder.encode(params[i+1],"UTF-8");
++				if((i+1)<params.length) veri+="&";
++			}
++
++			bufferedWriter.write(veri);
++			bufferedWriter.flush();
++			bufferedWriter.close();
++			outputStream.close();
++			InputStream inputStream = httpURLConnection.getInputStream();
++			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
++			StringBuilder stringBuilder = new StringBuilder();
++			String line = "";
++
++
++			while ((line=bufferedReader.readLine())!=null)
++			{
++				stringBuilder.append(line+"\n");
++			}
++
++			httpURLConnection.disconnect();
++			Thread.sleep(5000);
++			Log.i("VeriGönderildi",urlm+"?"+veri);
++
++			return stringBuilder.toString().trim();
++		}
++		catch (MalformedURLException e){
++			e.printStackTrace();
++		} catch (IOException e) {
++			e.printStackTrace();
++		} catch (InterruptedException e) {
++			e.printStackTrace();
++		}
++		return null;
++
++	}
+-	}
++}
+Index: app/src/main/java/com/madlion/benimtercihim/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/MainActivity.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/MainActivity.java	(revision 0123643742c7d8390bb7e0d565f7d6f54af19932)
+@@ -1,8 +1,11 @@
+ package com.madlion.benimtercihim;
+ 
+ import android.content.Intent;
++import android.drm.DrmStore;
++import android.os.AsyncTask;
+ import android.support.v7.app.AppCompatActivity;
+ import android.os.Bundle;
++import android.util.Log;
+ import android.view.View;
+ import android.widget.Button;
+ import android.widget.EditText;
+@@ -10,22 +13,42 @@
+ 
+ import com.android.volley.AuthFailureError;
+ import com.android.volley.Request;
++import com.android.volley.RequestQueue;
+ import com.android.volley.Response;
+ import com.android.volley.VolleyError;
+ import com.android.volley.toolbox.StringRequest;
++import com.android.volley.toolbox.Volley;
+ 
++import org.json.JSONException;
++import org.json.JSONObject;
++
+ import java.net.URI;
+ import java.net.URL;
+ import java.util.HashMap;
+ import java.util.Map;
+ 
++import static java.lang.Thread.sleep;
++
+ public class MainActivity extends AppCompatActivity {
++    @Override
++    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
++        if(requestCode==1001)
++        {
++            if(resultCode==1002)
++            {
++                ((EditText) findViewById(R.id.kullanici)).setText(data.getStringExtra("kullanici"));
++                ((EditText) findViewById(R.id.sifre)).setText(data.getStringExtra("sifre"));
+ 
++            }
++        }
++        super.onActivityResult(requestCode, resultCode, data);
++    }
++
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_main);
+-
++        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+         Button yeniuye, devam, sifrehatirla, giris;
+ 
+         yeniuye=(Button) findViewById(R.id.yeniuye);
+@@ -40,7 +63,9 @@
+             @Override
+             public void onClick(View view) {
+                 Intent i=new Intent(MainActivity.this,YeniUye.class);
+-                startActivity(i);
++                startActivityForResult(i,1001);
++                Log.i(ArkaplanIsleri.TAG_Job,"Yeni üye kaydı yapma");
++
+             }
+         });
+         devam.setOnClickListener(new View.OnClickListener() {
+@@ -48,6 +73,8 @@
+             public void onClick(View view) {
+                 Intent i=new Intent(MainActivity.this,Sorgula.class);
+                 startActivity(i);
++                Log.i(ArkaplanIsleri.TAG_Job,"Oturum Açmadan sorgulama yapma");
++
+             }
+         });
+         sifrehatirla.setOnClickListener(new View.OnClickListener() {
+@@ -55,6 +82,8 @@
+             public void onClick(View view) {
+                 Intent i=new Intent(MainActivity.this,SifreHatirlat.class);
+                 startActivity(i);
++                Log.i(ArkaplanIsleri.TAG_Job,"Şifre Sıfırlama Ekranına Geçiş");
++
+             }
+         });
+         giris.setOnClickListener(new View.OnClickListener() {
+@@ -62,47 +91,29 @@
+             public void onClick(View view) {
+                 final EditText k=(EditText) findViewById(R.id.kullanici);
+                 final EditText s=(EditText) findViewById(R.id.sifre);
++                Log.i(ArkaplanIsleri.TAG_Job,"Oturum Açma girişimi");
+ 
+-                StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"giris.php",
+-                        new Response.Listener<String>() {
+-                            @Override
+-                            public void onResponse(String response) {
+-                                // Sonuç geldiğinde burada mesaj verilecek
+-                                Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+response,Toast.LENGTH_LONG).show();
+-                                if(response.contains("success"))
++                String[] params = new String[6];
++                params[0]=Genel_Islemler.siteadresi+"giris";
++                params[1]="eposta";
++                params[2]=k.getText().toString();
++                params[3]="sifre";
++                params[4]=s.getText().toString();
++
++                ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),MainActivity.this);
++                String r=ai.getResponseFrom(params, ArkaplanIsleri.RequestType.POST);
++                if(r.contains("giris_basarili"))
+-                                {
++                {
+-                                    //
+-                                    //
+-                                    //Oturum Açıldı
+-                                    //
+-                                    //eğer sonuç olumlu ise üye sayfasına geç.
++                    Log.i(ArkaplanIsleri.TAG_Response,r);
+-                                    Intent i=new Intent(MainActivity.this,UyeSayfasi.class);
++                    Intent i=new Intent(MainActivity.this,UyeSayfasi.class);
+-                                    i.putExtra("kullanici", k.getText().toString());
++                    i.putExtra("kullanici",k.getText().toString());
+-                                    startActivity(i);
+-                                }
++                    startActivity(i);
++                }
++                else
++                    Log.i(ArkaplanIsleri.TAG_Job,"Oturum Açılamadı.");
+-                            }
++            }
+-                        }, new Response.ErrorListener() {
+-                    @Override
+-                    public void onErrorResponse(VolleyError error) {
+-                        //
+-                        //
+-                        //Oturum Açılamadı
+-                        //
+-                        //hata oluşursa mesaj burada verilecek
+-                        Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+error.getMessage(),Toast.LENGTH_LONG).show();
+-
+-                    }
+-                }) {
+-                    @Override
+-                    protected Map<String, String> getParams() throws AuthFailureError {
+-                        Map<String, String> params = new HashMap<String, String>();
+-                        params.put("kullanci_adi", k.getText().toString());
+-                        params.put("sifre", s.getText().toString());
+-                        return params;
+-                    }
+-                };
+-            }
+         });
+ 
+     }
++
+ }
+Index: app/src/main/java/com/madlion/benimtercihim/SifreDegistir.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/SifreDegistir.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/SifreDegistir.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -3,6 +3,7 @@
+ import android.content.Intent;
+ import android.support.v7.app.AppCompatActivity;
+ import android.os.Bundle;
++import android.util.Log;
+ import android.view.View;
+ import android.widget.Button;
+ import android.widget.EditText;
+@@ -25,9 +26,9 @@
+         setContentView(R.layout.activity_sifre_degistir);
+         final String kullanici;
+ 
+-        if(!savedInstanceState.isEmpty())
++        if(getIntent().hasExtra("kullanici"))
+         {
+-            kullanici=savedInstanceState.getString("kullanici");
++            kullanici=getIntent().getExtras().getString("kullanici");
+             final EditText es,ys1,ys2;
+             Button btnSifreDegistir = (Button) findViewById(R.id.btnSifreDegistir);
+             Button vazgec = (Button) findViewById(R.id.vazgec);
+@@ -57,14 +58,20 @@
+                                         if(response.contains("success"))
+                                         {
+                                             //eğer sonuç olumlu ise uye sayfasına geri dön.
++                                            Log.i("Yapılanİşlem","Şifre değiştirildi");
++
+                                             finish();
+                                         }
++                                        else
++                                            Log.i("Yapılanİşlem","şifre değiştilemedi");
++
+                                     }
+                                 }, new Response.ErrorListener() {
+                             @Override
+                             public void onErrorResponse(VolleyError error) {
+                                 //hata oluşursa mesaj burada verilecek
+                                 Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+error.getMessage(),Toast.LENGTH_LONG).show();
++                                Log.i("Yapılanİşlem","Şifre değiştirmede hata");
+ 
+                             }
+                         }) {
+Index: app/src/main/java/com/madlion/benimtercihim/SifreHatirlat.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/SifreHatirlat.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/SifreHatirlat.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -3,6 +3,7 @@
+ import android.app.AlertDialog;
+ import android.support.v7.app.AppCompatActivity;
+ import android.os.Bundle;
++import android.util.Log;
+ import android.view.View;
+ import android.widget.Button;
+ import android.widget.EditText;
+@@ -25,6 +26,7 @@
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_sifre_hatirlat);
+         Button btnSifreSifirla=(Button) findViewById(R.id.btnSifreSifirla);
++        String kullanici=getIntent().getExtras().getString("kullanici");
+         btnSifreSifirla.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+@@ -42,6 +44,8 @@
+                                     Toast.makeText(getBaseContext(), "İstek gönderildi. Gelen sonuç : " + response, Toast.LENGTH_LONG).show();
+                                     if (response.contains("success")) {
+                                         //eğer sonuç olumlu ise anasayfaya geri dön.
++                                        Log.i("Yapılanİşlem","Şifre sıfırlama talebi alındı");
++
+                                         finish();
+                                     }
+                                 }
+@@ -50,7 +54,7 @@
+                         public void onErrorResponse(VolleyError error) {
+                             //hata oluşursa mesaj burada verilecek
+                             Toast.makeText(getBaseContext(), "İstek gönderildi. Gelen sonuç : " + error.getMessage(), Toast.LENGTH_LONG).show();
+-
++                            Log.i("Yapılanİşlem","Şifre sıfırlama işleminde hata");
+                         }
+                     }) {
+                         @Override
+@@ -61,15 +65,6 @@
+                             return params;
+                         }
+                     };
+-                }
+-                if(eposta.getText().toString()!="")
+-                {
+-                    URI u=Genel_Islemler.adresyaz("islem=sifresifirla&eposta="+eposta.getText().toString());
+-                    String c=Genel_Islemler.getWebPage(u.toString(),getBaseContext());
+-                    if(c.equals("success"))
+-                        Toast.makeText(getBaseContext(),getString(R.string.sifresifirlamesajbasari),Toast.LENGTH_LONG).show();
+-                    else
+-                        Toast.makeText(getBaseContext(),getString(R.string.sifresifirlamesajhata),Toast.LENGTH_LONG).show();
+                 }
+             }
+         });
+Index: app/src/main/java/com/madlion/benimtercihim/Sorgula.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/Sorgula.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/Sorgula.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -5,7 +5,9 @@
+ import android.os.Parcel;
+ import android.support.v7.app.AppCompatActivity;
+ import android.os.Bundle;
++import android.util.Log;
+ import android.view.View;
++import android.widget.ArrayAdapter;
+ import android.widget.Button;
+ import android.widget.EditText;
+ import android.widget.RatingBar;
+@@ -44,7 +46,17 @@
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_sorgula);
+         Button btnSorgula;
++        ArrayList<String> puan=new ArrayList<String>();
++        puan.add("MF-1");
++        puan.add("TM-1");
++        puan.add("MF-2");
++        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
++                this,
++                android.R.layout.simple_spinner_item,
++                puan );
++        ((Spinner) findViewById(R.id.spnPuan)).setAdapter(arrayAdapter);
+ 
++
+         btnSorgula = (Button) findViewById(R.id.btnSorgula);
+         btnSorgula.setOnClickListener(new View.OnClickListener() {
+             @Override
+@@ -66,9 +78,44 @@
+                 rtUlasim = ((RatingBar) findViewById(R.id.rtUlasim)).getRating();
+                 rtGuvenlik = ((RatingBar) findViewById(R.id.rtGuvenlik)).getRating();
+ 
+-                spnPuan = ((TextView) ((Spinner) findViewById(R.id.spnPuan)).getChildAt(((Spinner) findViewById(R.id.spnPuan)).getSelectedItemPosition()).findViewById(R.id.textView)).getText().toString();
++                Log.i("Yapılanİşlem","Sorgula düğmesine basıldı");
+ 
+-                StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi + "unisorgula.php",
++                spnPuan = ((Spinner) findViewById(R.id.spnPuan)).getSelectedItem().toString();
++
++                String[] params=new String[23];
++                params[0]=Genel_Islemler.siteadresi + "sorgula";
++                params[1]="bolumpuan"; params[2]= "BETWEEN "+edtMin + " AND " + edtMak;
++                params[3]="sehirkira"; params[4]= String.valueOf(rtKira);
++                params[5]="sehiryurt"; params[6]= String.valueOf(rtYurt);
++                params[7]="sehiryemek"; params[8]= String.valueOf(rtYemek);
++                params[9]="sehiralisveris"; params[10]= String.valueOf(rtAlisVeris);
++                params[11]="sehirsosyal"; params[12]= String.valueOf(rtSehirSosyal);
++                params[13]="unisosyal"; params[14]= String.valueOf(rtUniSosyal);
++                params[15]="bolumisimkani"; params[16]= String.valueOf(rtIsImkani);
++                params[17]="sehirulasim"; params[18]= String.valueOf(rtUlasim);
++                params[19]="sehirguvenlik"; params[20]= String.valueOf(rtGuvenlik);
++                params[21]="bolumpuanturu"; params[22]= spnPuan;
++
++                ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),Sorgula.this);
++                String r=ai.getResponseFrom(params, ArkaplanIsleri.RequestType.POST);
++
++                XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
++                if(x.getElementCount("bolum")>0)
++                {
++                    ArrayList<String> bolum=new ArrayList<String>();
++                    for(int i=0;i<x.getElementCount("bolum");i++)
++                    {
++                        Log.i(ArkaplanIsleri.TAG_Job,x.getElementValue("bolumler/"+String.valueOf(i)+"/bolum/0/bolumid"));
++                        bolum.add(Integer.parseInt(x.getElementValue("bolumler/"+String.valueOf(i)+"/bolum/0/bolumid")),x.getElementValue("bolumler/"+String.valueOf(i)+"/bolum/0/bolumadi"));
++                    }
++                    Log.i(ArkaplanIsleri.TAG_Response,"Sorgu Sonucu Kayıt Sayısı:"+String.valueOf(bolum.size()));
++                    Intent i = new Intent(Sorgula.this, SorguRapor.class);
++                    i.putStringArrayListExtra("liste",bolum);
++                    startActivity(i);
++
++                }
++/*
++                StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi + "/sorgula",
+                         new Response.Listener<String>() {
+                             @Override
+                             public void onResponse(String response) {
+@@ -85,8 +132,7 @@
+                                     //
+                                     // putextra ile activity ler arası veri transferi mümkün ama
+                                     // bütün bir bölüm üniversite listesini nasıl göndereceğiz
+-
+-
++                                    Log.i("Yapılanİşlem","sorgulama sonucu alındı");
+                                     ArrayList<String> sonuclar=null;
+                                     try {
+                                         JSONArray jsonArray = new JSONArray(response);
+@@ -121,7 +167,7 @@
+                     public void onErrorResponse(VolleyError error) {
+                         //hata oluşursa mesaj burada verilecek
+                         Toast.makeText(getBaseContext(), "İstek gönderildi. Gelen sonuç : " + error.getMessage(), Toast.LENGTH_LONG).show();
+-
++                        Log.i("Yapılanİşlem","sorgulama sonucu alınamadı");
+                     }
+                 }) {
+                     @Override
+@@ -131,17 +177,17 @@
+                         //PHP kanadında SQL kodu oluşturulacak ve
+                         //sorgulama sonucunda elde edilen veriler geri döndürülecek.
+                         Map<String, String> params = new HashMap<String, String>();
+-                        params.put("bolum.puan", edtMin + ":" + edtMak);
+-                        params.put("sehir.kira", String.valueOf(rtKira));
+-                        params.put("sehir.yurt", String.valueOf(rtYurt));
+-                        params.put("sehir.yemek", String.valueOf(rtYemek));
+-                        params.put("sehir.alisveris", String.valueOf(rtAlisVeris));
+-                        params.put("sehir.sosyal", String.valueOf(rtSehirSosyal));
+-                        params.put("uni.sosyal", String.valueOf(rtUniSosyal));
+-                        params.put("bolum.isimkani", String.valueOf(rtIsImkani));
+-                        params.put("sehir.ulasim", String.valueOf(rtUlasim));
+-                        params.put("sehir.guvenlik", String.valueOf(rtGuvenlik));
+-                        params.put("bolum.puanturu", spnPuan);
++                        params.put("bolumpuan", edtMin + ":" + edtMak);
++                        params.put("sehirkira", String.valueOf(rtKira));
++                        params.put("sehiryurt", String.valueOf(rtYurt));
++                        params.put("sehiryemek", String.valueOf(rtYemek));
++                        params.put("sehiralisveris", String.valueOf(rtAlisVeris));
++                        params.put("sehirsosyal", String.valueOf(rtSehirSosyal));
++                        params.put("unisosyal", String.valueOf(rtUniSosyal));
++                        params.put("bolumisimkani", String.valueOf(rtIsImkani));
++                        params.put("sehirulasim", String.valueOf(rtUlasim));
++                        params.put("sehirguvenlik", String.valueOf(rtGuvenlik));
++                        params.put("bolumpuanturu", spnPuan);
+                         return params;
+ 
+                         /*
+@@ -158,10 +204,11 @@
+                                 +" and sehir.guvenlik>="+rtGuvenlik
+                                 +" and bolum.puanturu='"+spnPuan+"'"
+                                 +"";
+-                                */
++                                * /
+ 
+                     }
+                 };
++                */
+ 
+             }
+         });
+Index: app/src/main/java/com/madlion/benimtercihim/SorguRapor.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/SorguRapor.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/SorguRapor.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -2,9 +2,14 @@
+ 
+ import android.support.v7.app.AppCompatActivity;
+ import android.os.Bundle;
++import android.util.Log;
++import android.widget.ArrayAdapter;
++import android.widget.ListAdapter;
++import android.widget.ListView;
+ import android.widget.Toast;
+ 
+ import java.util.ArrayList;
++import java.util.List;
+ 
+ public class SorguRapor extends AppCompatActivity {
+ 
+@@ -15,11 +20,18 @@
+         ArrayList<String> liste=savedInstanceState.getStringArrayList("liste");
+         if(liste.size()>0)
+         {
+-
++            ListView l=(ListView) findViewById(R.id.lstSorguSonuc);
++            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
++                    this,
++                    R.layout.listview_bolum,
++                    liste );
++            l.setAdapter(arrayAdapter);
++            Log.i("Yapılanİşlem","bölümler listesi oluşturuldu");
+         }
+         else
+         {
+             Toast.makeText(getBaseContext(),"Arama sonucunda kriterlere uygun kayıt bulunamadı. Aramanızı düzeltip tekrar deneyiniz.",Toast.LENGTH_LONG).show();
++            Log.i("Yapılanİşlem","bölüm listesi için içerik bulunamadı");
+             finish();
+         }
+     }
+Index: app/src/main/java/com/madlion/benimtercihim/UniDegerlendir.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/UniDegerlendir.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/UniDegerlendir.java	(revision 4a023a36b64f3286c957a8827a06c1c8b5dcd097)
+@@ -3,8 +3,10 @@
+ import android.content.Intent;
+ import android.support.v7.app.AppCompatActivity;
+ import android.os.Bundle;
++import android.util.Log;
+ import android.view.View;
+ import android.widget.AdapterView;
++import android.widget.ArrayAdapter;
+ import android.widget.Button;
+ import android.widget.EditText;
+ import android.widget.RatingBar;
+@@ -18,6 +20,11 @@
+ import com.android.volley.VolleyError;
+ import com.android.volley.toolbox.StringRequest;
+ 
++import org.json.JSONArray;
++import org.json.JSONException;
++import org.json.JSONObject;
++
++import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.Map;
+ 
+@@ -32,34 +39,97 @@
+         spnUni=(Spinner) findViewById(R.id.spnUni);
+         spnBolum=(Spinner) findViewById(R.id.spnBolum);
+ 
++        String kullanici="";
++        if(getIntent().hasExtra("kullanici")) kullanici=getIntent().getExtras().getString("kullanici");
++
++        final String finalKullanici = kullanici;
++
++        ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
++        String[] params = new String[1];
++        params[0]=Genel_Islemler.siteadresi+"sehirler";
++        String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
++        try {
++            JSONArray liste = new JSONObject(r).getJSONArray("sehirler");
++            Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
++            ArrayList<String> shr=new ArrayList<String>(liste.length());
++            shr.add("Seçiniz");
++            JSONObject x;
++            if(liste.length()>0)
++            {
++                Integer plaka=0;
++                String sehir="";
++                for(int i=0;i<liste.length();i++)
++                {
++                    x=liste.getJSONObject(i);
++                    plaka=x.getInt("plaka");
++                    sehir=x.getString("sehir");
++                    shr.add(String.valueOf(plaka)+"-"+sehir);
++                }
++                ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
++                spnSehir.setAdapter(shr_adp);
++            }
++            else
++            {
++                Toast.makeText(getBaseContext(),"Şehirler listesi alınamadı. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
++            }
++        } catch (JSONException e) {
++            e.printStackTrace();
++        }
++
++//        XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
++//        if(x.getElementCount("sehir")>0)
++//        {
++//            ArrayList<String> shr=new ArrayList<String>();
++//            for(int i=0;i<x.getElementCount("sehir");i++)
++//            {
++//                shr.add(Integer.parseInt(x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/plaka")),x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/sehir"));
++//            }
++//            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
++//            spnSehir.setAdapter(shr_adp);
++//
++//        }
++
+         spnSehir.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+             @Override
+             public void onItemSelected(final AdapterView<?> parent, View view, final int position, long id) {
+-                if(position>-1)
++                if(position>0)
+                 {
+-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"unigetir.php",
+-                            new Response.Listener<String>() {
+-                                @Override
+-                                public void onResponse(String response) {
+-                                    if(response.contains("success"))
++                    Toast.makeText(getBaseContext(),String.valueOf(position),Toast.LENGTH_LONG).show();
++                    String[] params = new String[1];
++                    //seçilen elemanın metni "-" karakterine bölünüp oluşan dizinin ilk öğesi alınır (plaka)
++                    params[0]=Genel_Islemler.siteadresi+"universiteler&sehirid="+parent.getItemAtPosition(position).toString().split("-")[0];
++                    Log.i(ArkaplanIsleri.TAG_Job,parent.getItemAtPosition(position).toString());
++
++                    Log.i("Şehir Seçimi","Başarılı");
++                    ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
++                    String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
++                    try {
++                        JSONArray liste = new JSONObject(r).getJSONArray("universiteler");
++                        Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
++                        ArrayList<String> shr=new ArrayList<String>(liste.length());
++                        shr.add("Seçiniz");
++                        JSONObject x;
++                        if(liste.length()>0)
+-                                    {
++                        {
+-                                        //eğer sonuç olumlu ise üniversite listesini doldur..
++                            Integer uniid=0;
++                            String uniadi="";
++                            for(int i=0;i<liste.length();i++)
++                            {
++                                x=liste.getJSONObject(i);
++                                uniid=x.getInt("universite_id");
++                                uniadi=x.getString("ad");
++                                shr.add(String.valueOf(uniid)+"-"+uniadi);
+-                                    }
++                            }
++                            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
++                            spnUni.setAdapter(shr_adp);
+-                                }
++                        }
+-                            }, new Response.ErrorListener() {
+-                        @Override
+-                        public void onErrorResponse(VolleyError error) {
+-                            //hata oluşursa mesaj burada verilecek
++                        else
++                        {
++                            Toast.makeText(getBaseContext(),"Üniversite listesi alınamadı. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+                         }
+-                    }) {
+-                        @Override
+-                        protected Map<String, String> getParams() throws AuthFailureError {
+-                            Map<String, String> params = new HashMap<String, String>();
+-                            params.put("sehir", ((TextView)((View) parent.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
+-                            return params;
++                    } catch (JSONException e) {
++                        e.printStackTrace();
+-                        }
++                    }
+-                    };
+-
+                 }
+             }
+             @Override
+@@ -71,32 +141,13 @@
+             public void onItemSelected(final AdapterView<?> parent, View view, final int position, long id) {
+                 if(position>-1)
+                 {
+-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"bolumgetir.php",
+-                            new Response.Listener<String>() {
+-                                @Override
+-                                public void onResponse(String response) {
+-                                    if(response.contains("success"))
+-                                    {
+-                                        //eğer sonuç olumlu ise bölüm listesini doldur..
++                    String[] params = new String[1];
++                    //seçilen elemanın metni "-" karakterine bölünüp oluşan dizinin ilk öğesi alınır (plaka)
++                    params[0]=Genel_Islemler.siteadresi+"bolumler&universiteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
++                    Log.i(ArkaplanIsleri.TAG_Job,parent.getItemAtPosition(position).toString());
+-                                    }
+-                                }
++                }
++            }
+-                            }, new Response.ErrorListener() {
+-                        @Override
++            @Override
+-                        public void onErrorResponse(VolleyError error) {
+-                            //hata oluşursa mesaj burada verilecek
+-                        }
+-                    }) {
+-                        @Override
+-                        protected Map<String, String> getParams() throws AuthFailureError {
+-                            Map<String, String> params = new HashMap<String, String>();
+-                            params.put("uni", ((TextView)((View) parent.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
+-                            return params;
+-                        }
+-                    };
+-
+-                }
+-            }
+-            @Override
+             public void onNothingSelected(AdapterView<?> parent) {
+             }
+         });
+@@ -137,17 +188,17 @@
+                     @Override
+                     protected Map<String, String> getParams() throws AuthFailureError {
+                         Map<String, String> params = new HashMap<String, String>();
+-                        params.put("uni.adi", ((TextView)((View) spnUni.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
+-                        params.put("sehir.kira", String.valueOf(rtKira));
+-                        params.put("sehir.yurt", String.valueOf(rtYurt));
+-                        params.put("sehir.yemek", String.valueOf(rtYemek));
+-                        params.put("sehir.alisveris", String.valueOf(rtAlisVeris));
+-                        params.put("sehir.sosyal", String.valueOf(rtSehirSosyal));
+-                        params.put("uni.sosyal", String.valueOf(rtUniSosyal));
+-                        params.put("bolum.isimkani", String.valueOf(rtIsImkani));
+-                        params.put("sehir.ulasim", String.valueOf(rtUlasim));
+-                        params.put("sehir.guvenlik", String.valueOf(rtGuvenlik));
+-                        params.put("bolum.adi", ((TextView)((View) spnBolum.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
++                        params.put("uniadi", ((TextView)((View) spnUni.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
++                        params.put("sehirkira", String.valueOf(rtKira));
++                        params.put("sehiryurt", String.valueOf(rtYurt));
++                        params.put("sehiryemek", String.valueOf(rtYemek));
++                        params.put("sehiralisveris", String.valueOf(rtAlisVeris));
++                        params.put("sehirsosyal", String.valueOf(rtSehirSosyal));
++                        params.put("unisosyal", String.valueOf(rtUniSosyal));
++                        params.put("bolumisimkani", String.valueOf(rtIsImkani));
++                        params.put("sehirulasim", String.valueOf(rtUlasim));
++                        params.put("sehirguvenlik", String.valueOf(rtGuvenlik));
++                        params.put("bolumadi", ((TextView)((View) spnBolum.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
+                         return params;
+                     }
+                 };
+Index: app/src/main/java/com/madlion/benimtercihim/UyeSayfasi.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/UyeSayfasi.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/UyeSayfasi.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -5,8 +5,10 @@
+ import android.support.v7.app.AlertDialog;
+ import android.support.v7.app.AppCompatActivity;
+ import android.os.Bundle;
++import android.util.Log;
+ import android.view.View;
+ import android.widget.Button;
++import android.widget.TextView;
+ import android.widget.Toast;
+ 
+ import com.android.volley.AuthFailureError;
+@@ -28,7 +30,8 @@
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_uye_sayfasi);
+-        final String kullanici=savedInstanceState.getString("kullanici");
++        final String kullanici=getIntent().getExtras().getString("kullanici");
++        ((TextView) findViewById(R.id.textView33)).setText(kullanici);
+ 
+         Button btnUniDeg, btnUniSor, btnSifreSifirla, btnUyelikSil;
+ 
+@@ -40,17 +43,21 @@
+         btnUniDeg.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                Intent i=new Intent(UyeSayfasi.this,Sorgula.class);
++                Intent i=new Intent(UyeSayfasi.this,UniDegerlendir.class);
+                 i.putExtra("kullanici",kullanici);
+                 startActivity(i);
++                Log.i(ArkaplanIsleri.TAG_Job,"Üniversite Değerlendirme");
++
+             }
+         });
+         btnUniSor.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                Intent i=new Intent(UyeSayfasi.this,UniDegerlendir.class);
++                Intent i=new Intent(UyeSayfasi.this,Sorgula.class);
+                 i.putExtra("kullanici",kullanici);
+                 startActivity(i);
++                Log.i(ArkaplanIsleri.TAG_Job,"Üniversite Sorgulama");
++
+             }
+         });
+         btnSifreSifirla.setOnClickListener(new View.OnClickListener() {
+@@ -59,65 +66,32 @@
+                 Intent i=new Intent(UyeSayfasi.this,SifreDegistir.class);
+                 i.putExtra("kullanici",kullanici);
+                 startActivity(i);
++                Log.i(ArkaplanIsleri.TAG_Job,"Şifre Sıfırlama");
++
+             }
+         });
+         btnUyelikSil.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                AlertDialog.Builder a = new AlertDialog.Builder(getBaseContext()).setTitle("UYARI").setMessage("Üyeliğinizi silmek istediğinze emin misiniz?\nBu işlemin geri dönüşü yoktur.").setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+-                    @Override
+-                    public void onClick(DialogInterface dialog, int which) {
++                        AlertDialog.Builder a = new AlertDialog.Builder(getBaseContext()).setTitle("UYARI").setMessage("Üyeliğinizi silmek istediğinze emin misiniz?\nBu işlemin geri dönüşü yoktur.").setPositiveButton("Evet", new DialogInterface.OnClickListener() {
++                            @Override
++                            public void onClick(DialogInterface dialog, int which) {
+-                        StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"uyeliksil.php",
+-                                new Response.Listener<String>() {
+-                                    @Override
+-                                    public void onResponse(String response) {
+-                                        // Sonuç geldiğinde burada mesaj verilecek
+-                                        Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+response,Toast.LENGTH_LONG).show();
+-                                        if(response.contains("success"))
++                        String[] params=new String[3];
++                        params[0]=Genel_Islemler.siteadresi+"giris?xml=1";
++                        params[1]="kullanici";
++                        params[2]=kullanici;
++                        ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UyeSayfasi.this);
++                        String r=ai.getResponseFrom(params, ArkaplanIsleri.RequestType.POST);
++                        if(r.contains("silme_basarili"))
+-                                        {
++                        {
+-                                            //
+-                                            //
+-                                            //Kullanıcı Silindi
+-                                            //
+-                                            //Uygulama anasayfasına geç
+-                                            try {
+-                                                JSONArray jsonArray = new JSONArray(response);
+-                                                JSONObject jsonObject = jsonArray.getJSONObject(0);
+-                                                String code = jsonObject.getString("code");
+-                                                String message = jsonObject.getString("message");
+-                                                if(code.equals("success"))
+-                                                {
+-                                                    Toast.makeText(getBaseContext(),"Üyelik Silme işlemi başarıyla tamamlandı.",Toast.LENGTH_LONG).show();
++                            Log.i(ArkaplanIsleri.TAG_Response,r);
++                            Intent i=new Intent(UyeSayfasi.this,MainActivity.class);
++                            i.putExtra("kullanici","deneme");
++                            startActivity(i);
+-                                                }
+-                                                else
++                        }
++                        else
+-                                                {
+-                                                    Toast.makeText(getBaseContext(),"Üyelik Silme İşlemi başarısız oldu. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+-                                                }
++                            Log.i(ArkaplanIsleri.TAG_Response,"Üye silinemedi.");
+ 
+-                                            } catch (JSONException e) {
+-                                                e.printStackTrace();
+-                                            }
+-                                            finish();
+-                                        }
+-                                    }
+-                                }, new Response.ErrorListener() {
+-                            @Override
+-                            public void onErrorResponse(VolleyError error) {
+-                                //
+-                                //
+-                                //Üyelik Silinemedi
+-                                //
+-                                //hata oluşursa mesaj burada verilecek
+-                                Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+error.getMessage(),Toast.LENGTH_LONG).show();
+-                            }
+-                        }) {
+-                            @Override
+-                            protected Map<String, String> getParams() throws AuthFailureError {
+-                                Map<String, String> params = new HashMap<String, String>();
+-                                params.put("kullanci_adi", kullanici);
+-                                return params;
+-                            }
+-                        };
+                         dialog.dismiss();
+                     }
+                 }).setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
+Index: app/src/main/java/com/madlion/benimtercihim/XMLParse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/XMLParse.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
++++ app/src/main/java/com/madlion/benimtercihim/XMLParse.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -0,0 +1,122 @@
++package com.madlion.benimtercihim;
++
++import android.util.Log;
++
++import java.io.IOException;
++import java.io.PrintStream;
++import java.io.StringReader;
++import java.net.URL;
++import java.net.URLConnection;
++
++import javax.xml.parsers.DocumentBuilder;
++import javax.xml.parsers.DocumentBuilderFactory;
++import javax.xml.parsers.ParserConfigurationException;
++import org.w3c.dom.Document;
++import org.w3c.dom.Element;
++import org.w3c.dom.NodeList;
++import org.xml.sax.InputSource;
++import org.xml.sax.SAXException;
++
++/**
++ * Created by halilturkoglu on 31.12.2016.
++ */
++
++public class XMLParse {
++
++    String uri;
++    Document doc;
++
++    enum XMLType {
++        File,
++        URL,
++        StringVar
++    }
++
++    public XMLParse(String uri, XMLType type) {/*Type File*/
++        if(type==XMLType.File) {
++            try {
++                String filepath = uri;
++                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
++                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
++                this.doc = docBuilder.parse(filepath);
++            } catch (ParserConfigurationException pce) {
++                pce.printStackTrace();
++            } catch (IOException ioe) {
++                ioe.printStackTrace();
++            } catch (SAXException sae) {
++                sae.printStackTrace();
++            }
++        }
++        else if(type==XMLType.StringVar)
++        {
++            try {
++                InputSource is = new InputSource();
++                is.setCharacterStream(new StringReader(uri));
++                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
++                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
++                this.doc = docBuilder.parse(is);
++            } catch (ParserConfigurationException pce) {
++                pce.printStackTrace();
++            } catch (IOException ioe) {
++                ioe.printStackTrace();
++            } catch (SAXException sae) {
++                Log.i("veri",uri);
++                sae.printStackTrace();
++            }
++
++        }
++        else if(type==XMLType.URL)
++        {
++            try {
++                URL url = new URL(uri);
++                URLConnection conn = url.openConnection();
++                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
++                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
++                this.doc = docBuilder.parse(conn.getInputStream());
++            } catch (ParserConfigurationException pce) {
++                pce.printStackTrace();
++            } catch (IOException ioe) {
++                ioe.printStackTrace();
++            } catch (SAXException sae) {
++                sae.printStackTrace();
++            }
++        }
++        else
++        {
++            IOException e=null;
++            PrintStream s=null;
++            s.append("Geçersiz veri türü");
++            e.printStackTrace(s);
++        }
++    }
++
++    public int getElementCount(String elementName)
++    {
++        NodeList n = doc.getElementsByTagName(elementName);
++        return n.getLength();
++    }
++
++    public String getElementValue(String elementPath)
++    {
++        String[] el=elementPath.split("/");
++        if(el.length==1)
++        {
++            return doc.getElementsByTagName(el[0]).item(0).getNodeValue();
++        }
++        else
++        {
++            NodeList n=doc.getElementsByTagName(el[0]);
++            Element e= (Element) n.item(Integer.parseInt(el[1]));
++            for(int i=2;i<el.length;i+=2)
++            {
++                n=e.getElementsByTagName(el[i]);
++                if(i+1<el.length)
++                    e= (Element) n.item(Integer.parseInt(el[i+1]));
++                else
++                    e= (Element) n.item(0);
++            }
++            return e.getTextContent();
++        }
++
++    }
++}
+Index: app/src/main/java/com/madlion/benimtercihim/YeniUye.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/madlion/benimtercihim/YeniUye.java	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/java/com/madlion/benimtercihim/YeniUye.java	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -4,12 +4,15 @@
+ import android.app.AlertDialog;
+ import android.content.Intent;
+ import android.os.Bundle;
++import android.util.JsonReader;
++import android.util.Log;
+ import android.view.View;
+ import android.widget.Button;
+ import android.widget.EditText;
+ import android.widget.Toast;
+ 
+ import com.android.volley.*;
++import com.android.volley.toolbox.JsonArrayRequest;
+ import com.android.volley.toolbox.StringRequest;
+ import com.android.volley.toolbox.Volley;
+ 
+@@ -31,7 +34,7 @@
+         setContentView(R.layout.activity_yeni_uye);
+ 
+         final RequestQueue queue = Volley.newRequestQueue(getBaseContext());
+-        final String url=Genel_Islemler.siteadresi+"kayit.php";
++        final String url=Genel_Islemler.siteadresi+"kayit?xml=1";
+ 
+         Button btnUye=(Button) findViewById(R.id.btnUyeOl);
+         btnUye.setOnClickListener(new View.OnClickListener() {
+@@ -44,18 +47,54 @@
+                             public void onResponse(String response) {
+                                 // Display the first 500 characters of the response string.
+                                 // Sonuç geldiğinde burada mesaj verilecek
+-                                Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+response,Toast.LENGTH_LONG).show();
+-                                if(response.contains("success"))
++                                Log.i(ArkaplanIsleri.TAG_Response,response);
++
++                                if(response!=null)
+                                 {
++                                    /*
++                                    *
++                                    * XML Sonuç Dönerse
++                                    *
++                                    * adres satırının sonuna ?xml=1 yazarak XML sonuç almayı başardım.
++                                    *
++                                    * ve bu sonucu XMLParse ile okuyarak, istediğim sonucu elde edebildim.
++                                     */
++                                    XMLParse x=new XMLParse(response, XMLParse.XMLType.StringVar);
++                                    if(x.getElementValue("sunucu_cevabi/0/code").equals("kayit_basarili")) {
++                                        Log.i(ArkaplanIsleri.TAG_Response, "Kayıt Başarılı");
++                                        Intent i=new Intent(YeniUye.this,MainActivity.class);
++                                        i.putExtra("kullanici",((EditText)findViewById(R.id.edtKullanici)).getText().toString());
++                                        i.putExtra("sifre",((EditText)findViewById(R.id.edtSifre1)).getText().toString());
++                                        setResult(1002,i);
++                                        finishActivity(1001);
++                                    }
++                                    else {
++                                        Log.i(ArkaplanIsleri.TAG_Response, "Kayıt Başarısız");
++                                        Toast.makeText(getBaseContext(),"Kayıt İşlemi başarısız oldu. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
++                                    }
++                                    /*
++                                    *
++                                    *
++                                    *
++                                    * JSON Sonuç dönerse, ki döndü ama ben JSONArray a çeviremedim :D
++                                    *
++                                    *
++                                    *
+                                     //eğer sonuç olumlu ise anasayfaya geri dön.
+                                     try {
+-                                        JSONArray jsonArray = new JSONArray(response);
++                                        JSONObject object = new JSONObject(response);
++                                        JSONArray jsonArray = object.getJSONArray("sunucu_cevabi"); //ahanda burada hata verdi
+                                         JSONObject jsonObject = jsonArray.getJSONObject(0);
+                                         String code = jsonObject.getString("code");
+                                         String message = jsonObject.getString("message");
+-                                        if(code.equals("success"))
++                                        if(code.equals("kayit_basarili"))
+                                         {
+                                             Toast.makeText(getBaseContext(),"Kayıt İşlemi başarıyla tamamlandı. Şimdi oturum açabilirsiniz.",Toast.LENGTH_LONG).show();
++                                            Intent i=new Intent(YeniUye.this,MainActivity.class);
++                                            i.putExtra("kullanici",((EditText)findViewById(R.id.edtKullanici)).getText().toString());
++                                            i.putExtra("sifre",((EditText)findViewById(R.id.edtSifre1)).getText().toString());
++                                            setResult(1002,i);
++                                            finishActivity(1001);
+                                         }
+                                         else
+                                         {
+@@ -65,7 +104,7 @@
+                                     } catch (JSONException e) {
+                                         e.printStackTrace();
+                                     }
+-
++*/
+                                     finish();
+                                 }
+                             }
+@@ -73,7 +112,7 @@
+                     @Override
+                     public void onErrorResponse(VolleyError error) {
+                         //hata oluşursa mesaj burada verilecek
+-                        Toast.makeText(getBaseContext(),"İstek gönderildi. Gelen sonuç : "+error.getMessage(),Toast.LENGTH_LONG).show();
++                        Log.i(ArkaplanIsleri.TAG_Response,error.getMessage().isEmpty()?url:error.getMessage());
+ 
+                     }
+                 }) {
+Index: app/src/main/res/layout/activity_sorgu_rapor.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_sorgu_rapor.xml	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/res/layout/activity_sorgu_rapor.xml	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -23,7 +23,7 @@
+         android:layout_alignParentStart="true"
+         android:textAlignment="center" />
+ 
+-    <ListView
++    <com.madlion.benimtercihim.BolumListesi
+         android:layout_width="match_parent"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentStart="true"
+Index: app/src/main/res/layout/activity_uye_sayfasi.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_uye_sayfasi.xml	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/src/main/res/layout/activity_uye_sayfasi.xml	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -11,6 +11,14 @@
+     android:background="#f44336"
+     android:orientation="vertical">
+ 
++    <TextView
++        android:text="TextView"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:id="@+id/textView33"
++        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
++        android:textAlignment="center" />
++
+     <Button
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+Index: app/src/main/res/layout/listview_bolum.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/listview_bolum.xml	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
++++ app/src/main/res/layout/listview_bolum.xml	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -0,0 +1,45 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:orientation="vertical" >
++
++    <TextView
++        android:id="@+id/BolumAdi"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:padding="2dp"
++        android:text="Title"
++        android:textSize="16sp"
++        android:textStyle="bold" />
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="horizontal" >
++
++        <TextView
++            android:id="@+id/Universite"
++            android:layout_width="0dp"
++            android:layout_height="wrap_content"
++            android:layout_weight="1.97"
++            android:padding="2dp"
++            android:text="Date"
++            android:textSize="14sp"
++            android:textStyle="normal"  />
++
++        <TextView
++            android:id="@+id/Puan"
++            android:layout_width="84dp"
++            android:layout_height="wrap_content"
++            android:layout_gravity="right"
++            android:gravity="right"
++            android:maxLength="14"
++            android:padding="2dp"
++            android:text="Description"
++            android:textSize="12sp"
++            android:textStyle="italic" />
++
++    </LinearLayout>
++
++</LinearLayout>
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(revision 80bb82e526bcc95ad43cf4dfb8b27248513d1e7c)
++++ app/build.gradle	(revision 5ad770880fee993dd24c55986b5f9d7a5b3c8f0c)
+@@ -17,6 +17,7 @@
+     }
+     productFlavors {
+     }
++    useLibrary 'org.apache.http.legacy'
+ }
+ 
+ dependencies {

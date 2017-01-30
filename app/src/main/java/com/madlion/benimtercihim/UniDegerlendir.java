@@ -34,15 +34,20 @@ public class UniDegerlendir extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uni_degerlendir);
-        final Spinner spnSehir, spnUni, spnBolum;
+        final Spinner spnSehir, spnUni, spnBolum, spnFakulte;
         spnSehir=(Spinner) findViewById(R.id.spnSehir);
         spnUni=(Spinner) findViewById(R.id.spnUni);
+        spnFakulte=(Spinner) findViewById(R.id.spnFakulte);
         spnBolum=(Spinner) findViewById(R.id.spnBolum);
 
         String kullanici="";
+        String kid="";
         if(getIntent().hasExtra("kullanici")) kullanici=getIntent().getExtras().getString("kullanici");
+        if(getIntent().hasExtra("kid")) kid=getIntent().getExtras().getString("kid");
+        Log.i(ArkaplanIsleri.TAG_Job,kullanici+"-"+String.valueOf(kid));
 
         final String finalKullanici = kullanici;
+        final String finalKid = kid;
 
         ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
         String[] params = new String[1];
@@ -50,7 +55,6 @@ public class UniDegerlendir extends AppCompatActivity {
         String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
         try {
             JSONArray liste = new JSONObject(r).getJSONArray("sehirler");
-            Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
             ArrayList<String> shr=new ArrayList<String>(liste.length());
             shr.add("Seçiniz");
             JSONObject x;
@@ -76,19 +80,6 @@ public class UniDegerlendir extends AppCompatActivity {
             e.printStackTrace();
         }
 
-//        XMLParse x=new XMLParse(r, XMLParse.XMLType.StringVar);
-//        if(x.getElementCount("sehir")>0)
-//        {
-//            ArrayList<String> shr=new ArrayList<String>();
-//            for(int i=0;i<x.getElementCount("sehir");i++)
-//            {
-//                shr.add(Integer.parseInt(x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/plaka")),x.getElementValue("sehirler/"+String.valueOf(i)+"/sehir/0/sehir"));
-//            }
-//            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
-//            spnSehir.setAdapter(shr_adp);
-//
-//        }
-
         spnSehir.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(final AdapterView<?> parent, View view, final int position, long id) {
@@ -96,16 +87,11 @@ public class UniDegerlendir extends AppCompatActivity {
                 {
                     Toast.makeText(getBaseContext(),String.valueOf(position),Toast.LENGTH_LONG).show();
                     String[] params = new String[1];
-                    //seçilen elemanın metni "-" karakterine bölünüp oluşan dizinin ilk öğesi alınır (plaka)
                     params[0]=Genel_Islemler.siteadresi+"universiteler&sehirid="+parent.getItemAtPosition(position).toString().split("-")[0];
-                    Log.i(ArkaplanIsleri.TAG_Job,parent.getItemAtPosition(position).toString());
-
-                    Log.i("Şehir Seçimi","Başarılı");
                     ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
                     String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
                     try {
                         JSONArray liste = new JSONObject(r).getJSONArray("universiteler");
-                        Log.i(ArkaplanIsleri.TAG_Response,"Toplam Sayı:"+String.valueOf(liste.length()));
                         ArrayList<String> shr=new ArrayList<String>(liste.length());
                         shr.add("Seçiniz");
                         JSONObject x;
@@ -139,16 +125,88 @@ public class UniDegerlendir extends AppCompatActivity {
         spnUni.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(final AdapterView<?> parent, View view, final int position, long id) {
-                if(position>-1)
+                if(position>0)
                 {
                     String[] params = new String[1];
-                    //seçilen elemanın metni "-" karakterine bölünüp oluşan dizinin ilk öğesi alınır (plaka)
-                    params[0]=Genel_Islemler.siteadresi+"bolumler&universiteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
-                    Log.i(ArkaplanIsleri.TAG_Job,parent.getItemAtPosition(position).toString());
+                    params[0]=Genel_Islemler.siteadresi+"fakulteler&universiteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
+                    ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
+                    String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
+                    try {
+                        JSONArray liste = new JSONObject(r).getJSONArray("fakulteler");
+                        ArrayList<String> shr=new ArrayList<String>(liste.length());
+                        shr.add("Seçiniz");
+                        JSONObject x;
+                        if(liste.length()>0)
+                        {
+                            Integer fakulteid=0;
+                            String fakulteadi="";
+                            for(int i=0;i<liste.length();i++)
+                            {
+                                x=liste.getJSONObject(i);
+                                fakulteid=x.getInt("fakulte_id");
+                                fakulteadi=x.getString("ad");
+                                shr.add(String.valueOf(fakulteid)+"-"+fakulteadi);
+                            }
+                            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
+                            spnFakulte.setAdapter(shr_adp);
+                        }
+                        else
+                        {
+                            Toast.makeText(getBaseContext(),"Fakülteler listesi alınamadı. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        spnFakulte.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position>0)
+                {
+                    String[] params = new String[1];
+                    params[0]=Genel_Islemler.siteadresi+"bolumler&fakulteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
+                    ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
+                    String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
+                    try {
+                        JSONArray liste = new JSONObject(r).getJSONArray("bolumler");
+                        ArrayList<String> shr=new ArrayList<String>(liste.length());
+                        shr.add("Seçiniz");
+                        JSONObject x;
+                        if(liste.length()>0)
+                        {
+                            Integer bolumid=0;
+                            String bolumadi="";
+                            for(int i=0;i<liste.length();i++)
+                            {
+                                x=liste.getJSONObject(i);
+                                bolumid=x.getInt("bolum_id");
+                                bolumadi=x.getString("ad");
+                                shr.add(String.valueOf(bolumid)+"-"+bolumadi);
+                            }
+                            ArrayAdapter<String> shr_adp=new ArrayAdapter<String>(getBaseContext(),R.layout.support_simple_spinner_dropdown_item,shr);
+                            spnBolum.setAdapter(shr_adp);
+                        }
+                        else
+                        {
+                            Toast.makeText(getBaseContext(),"Bölümler listesi alınamadı. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -156,6 +214,46 @@ public class UniDegerlendir extends AppCompatActivity {
         btnDegerlendir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean bosgec=false;
+                String shr=spnSehir.getSelectedItem().toString();
+                String uni="", blm="", fkl="";
+                if(shr.isEmpty() || shr.equals("Seçiniz")) {
+                    Toast.makeText(UniDegerlendir.this, "Şehir seçimi yapmadınız.", Toast.LENGTH_SHORT).show();
+                    bosgec=true;
+                }
+                else
+                {
+                    shr=shr.split("-")[0];
+                    uni=spnUni.getSelectedItem().toString();
+                    if(uni.isEmpty() || uni.equals("Seçiniz")) {
+                        Toast.makeText(UniDegerlendir.this, "Üniversite seçimi yapmadınız.", Toast.LENGTH_SHORT).show();
+                        bosgec=true;
+                    }
+                    else
+                    {
+                        uni=uni.split("-")[0];
+                        fkl=spnFakulte.getSelectedItem().toString();
+                        if(fkl.isEmpty() || fkl.equals("Seçiniz")) {
+                            Toast.makeText(UniDegerlendir.this, "Fakülte seçimi yapmadınız.", Toast.LENGTH_SHORT).show();
+                            bosgec=true;
+                        }
+                        else
+                        {
+                            fkl=fkl.split("-")[0];
+                            blm=spnBolum.getSelectedItem().toString();
+                            if(blm.isEmpty() || blm.equals("Seçiniz")) {
+                                Toast.makeText(UniDegerlendir.this, "Bölüm seçimi yapmadınız.", Toast.LENGTH_SHORT).show();
+                                bosgec=true;
+                            }
+                            else
+                                blm=blm.split("-")[0];
+                        }
+                    }
+                }
+
+
+
+
                 final float rtKira, rtYurt, rtYemek, rtAlisVeris, rtSehirSosyal, rtUniSosyal, rtIsImkani, rtUlasim, rtGuvenlik;
 
                 rtKira=((RatingBar) findViewById(R.id.rtKira_p4)).getRating();
@@ -168,41 +266,38 @@ public class UniDegerlendir extends AppCompatActivity {
                 rtUlasim=((RatingBar) findViewById(R.id.rtUlasim_p4)).getRating();
                 rtGuvenlik=((RatingBar) findViewById(R.id.rtGuvenlik_p4)).getRating();
 
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"unidegerlendir.php",
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                if(response.contains("success"))
-                                {
-                                    //eğer sonuç olumlu ise anasayfaya geri dön..
-                                    Toast.makeText(getBaseContext(),"Değerlendirmeniz kaydedildi.",Toast.LENGTH_LONG).show();
-                                    finish();
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //hata oluşursa mesaj burada verilecek
-                    }
-                }) {
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<String, String>();
-                        params.put("uniadi", ((TextView)((View) spnUni.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
-                        params.put("sehirkira", String.valueOf(rtKira));
-                        params.put("sehiryurt", String.valueOf(rtYurt));
-                        params.put("sehiryemek", String.valueOf(rtYemek));
-                        params.put("sehiralisveris", String.valueOf(rtAlisVeris));
-                        params.put("sehirsosyal", String.valueOf(rtSehirSosyal));
-                        params.put("unisosyal", String.valueOf(rtUniSosyal));
-                        params.put("bolumisimkani", String.valueOf(rtIsImkani));
-                        params.put("sehirulasim", String.valueOf(rtUlasim));
-                        params.put("sehirguvenlik", String.valueOf(rtGuvenlik));
-                        params.put("bolumadi", ((TextView)((View) spnBolum.getSelectedItem()).findViewById(R.id.textView)).getText().toString());
-                        return params;
-                    }
-                };
 
+                Log.i(ArkaplanIsleri.TAG_Job,shr+"-"+uni+"-"+fkl+"-"+blm);
+                String[] params=new String[27];
+                params[0]=Genel_Islemler.siteadresi+"degerlendir";
+                params[1]="uniid"; params[2]=uni;
+                params[3]="sehirkira"; params[4]= String.valueOf(rtKira);
+                params[5]="sehiryurt"; params[6]= String.valueOf(rtYurt);
+                params[7]="sehiryemek"; params[8]= String.valueOf(rtYemek);
+                params[9]="sehiralisveris"; params[10]= String.valueOf(rtAlisVeris);
+                params[11]="sehirsosyal"; params[12]= String.valueOf(rtSehirSosyal);
+                params[13]="unisosyal"; params[14]= String.valueOf(rtUniSosyal);
+                params[15]="bolumisimkani"; params[16]= String.valueOf(rtIsImkani);
+                params[17]="sehir"; params[18]= shr;
+                params[19]="sehirguvenlik"; params[20]= String.valueOf(rtGuvenlik);
+                params[21]="bolumid"; params[22]= blm;
+                params[23]="kullanici_id"; params[24]= finalKid;
+                params[25]="fakulteid"; params[26]= fkl;
+//                params[27]="sehirulasim"; params[28]= String.valueOf(rtUlasim);
+//                Şehir ulaşım bilgisi veritabanında yok onun için kaldırdım
+
+                if(!bosgec)
+                {
+                    ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
+                    String r=ai.getResponseFrom(params, ArkaplanIsleri.RequestType.POST);
+                    if(r.contains("basarili"))
+                    {
+                        Toast.makeText(getBaseContext(),"Değerlendirmeniz kaydedildi.",Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                    else
+                        Toast.makeText(getBaseContext(),"Değerlendirmeniz kaydedilemedi.",Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

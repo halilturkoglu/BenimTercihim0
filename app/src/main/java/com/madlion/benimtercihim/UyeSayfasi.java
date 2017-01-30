@@ -31,6 +31,7 @@ public class UyeSayfasi extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uye_sayfasi);
         final String kullanici=getIntent().getExtras().getString("kullanici");
+        final String kid=getIntent().getExtras().getString("kid");
         ((TextView) findViewById(R.id.textView33)).setText(kullanici);
 
         Button btnUniDeg, btnUniSor, btnSifreSifirla, btnUyelikSil;
@@ -45,6 +46,7 @@ public class UyeSayfasi extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i=new Intent(UyeSayfasi.this,UniDegerlendir.class);
                 i.putExtra("kullanici",kullanici);
+                i.putExtra("kid",kid);
                 startActivity(i);
                 Log.i(ArkaplanIsleri.TAG_Job,"Üniversite Değerlendirme");
 
@@ -55,6 +57,7 @@ public class UyeSayfasi extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i=new Intent(UyeSayfasi.this,Sorgula.class);
                 i.putExtra("kullanici",kullanici);
+                i.putExtra("kid",kid);
                 startActivity(i);
                 Log.i(ArkaplanIsleri.TAG_Job,"Üniversite Sorgulama");
 
@@ -64,6 +67,7 @@ public class UyeSayfasi extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i=new Intent(UyeSayfasi.this,SifreDegistir.class);
+                i.putExtra("kid",kid);
                 i.putExtra("kullanici",kullanici);
                 startActivity(i);
                 Log.i(ArkaplanIsleri.TAG_Job,"Şifre Sıfırlama");
@@ -86,7 +90,6 @@ public class UyeSayfasi extends AppCompatActivity {
                         {
                             Log.i(ArkaplanIsleri.TAG_Response,r);
                             Intent i=new Intent(UyeSayfasi.this,MainActivity.class);
-                            i.putExtra("kullanici","deneme");
                             startActivity(i);
                         }
                         else

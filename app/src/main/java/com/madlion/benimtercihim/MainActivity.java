@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,11 +20,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-           yeniuye.setOnClickListener(new View.OnClickListener() {
+        yeniuye.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i=new Intent(MainActivity.this,YeniUye.class);
@@ -102,11 +105,23 @@ public class MainActivity extends AppCompatActivity {
 
                 ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),MainActivity.this);
                 String r=ai.getResponseFrom(params, ArkaplanIsleri.RequestType.POST);
-                if(r.contains("giris_basarili"))
+                if(r.contains("basarili"))
                 {
+                    String kid="0";
+                    try {
+                        JSONObject j=new JSONObject(r);
+                        kid=j.getString("id");
+//                        JSONArray liste = new JSONObject(r).getJSONArray("bolumler");
+//                        JSONObject x;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                     Log.i(ArkaplanIsleri.TAG_Response,r);
+                    Log.i(ArkaplanIsleri.TAG_Response,"ID : "+String.valueOf(kid));
                     Intent i=new Intent(MainActivity.this,UyeSayfasi.class);
                     i.putExtra("kullanici",k.getText().toString());
+                    i.putExtra("kid",kid);
                     startActivity(i);
                 }
                 else

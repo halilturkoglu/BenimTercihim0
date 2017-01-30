@@ -50,13 +50,32 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stFakulte"
+            android:id="@+id/textView30" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spnFakulte" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/strBolum"
-            android:id="@+id/textView30" />
+            android:id="@+id/textView31" />
 
         <Spinner
             android:layout_width="wrap_content"
@@ -89,7 +108,8 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/rtKira_p4" />
+                android:id="@+id/rtKira_p4"
+                android:max="5" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -100,6 +120,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtYurt_p4" />
 
             <TextView
@@ -111,6 +132,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtYemek_p4" />
 
             <TextView
@@ -122,6 +144,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtAlisVeris_p4" />
 
             <TextView
@@ -133,6 +156,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtSehirSosyal_p4" />
 
             <TextView
@@ -144,6 +168,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtUniSosyal_p4" />
 
             <TextView
@@ -155,6 +180,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtIsImkani_p4" />
 
             <TextView
@@ -166,6 +192,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtUlasim_p4" />
 
             <TextView
@@ -177,6 +204,7 @@
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:max="5"
                 android:id="@+id/rtGuvenlik_p4" />
         </LinearLayout>
     </ScrollView>

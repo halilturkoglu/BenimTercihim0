@@ -25,10 +25,12 @@ public class SifreDegistir extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sifre_degistir);
         final String kullanici;
+        Integer kid=0;
 
         if(getIntent().hasExtra("kullanici"))
         {
             kullanici=getIntent().getExtras().getString("kullanici");
+            if(getIntent().hasExtra("id")) kid=getIntent().getExtras().getInt("kid");
             final EditText es,ys1,ys2;
             Button btnSifreDegistir = (Button) findViewById(R.id.btnSifreDegistir);
             Button vazgec = (Button) findViewById(R.id.vazgec);

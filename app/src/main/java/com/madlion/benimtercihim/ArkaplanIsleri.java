@@ -69,7 +69,9 @@ public class ArkaplanIsleri extends AsyncTask<String,Void,String>{
         String[] x=new String[params.length+1];
         x[0]=(type==RequestType.GET)?"GET":"POST";
         for(int i=0;i<params.length;i++)
-            x[i+1]=params[i];
+            {
+            x[i + 1] = params[i];
+            }
         this.execute(x);
         while(this.getResponse()==null)
         {
@@ -106,6 +108,7 @@ public class ArkaplanIsleri extends AsyncTask<String,Void,String>{
                         urlm += params[1].contains("?")?"&":"?" + veri;
                 }
 
+                Log.i(ArkaplanIsleri.TAG_Job,urlm);
                 URL url = new URL(urlm);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod(params[0]);

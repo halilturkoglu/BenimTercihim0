@@ -4,21 +4,19 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.*;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +32,7 @@ public class YeniUye extends Activity {
         setContentView(R.layout.activity_yeni_uye);
 
         final RequestQueue queue = Volley.newRequestQueue(getBaseContext());
-        final String url=Genel_Islemler.siteadresi+"kayit?xml=1";
+        final String url=ArkaplanIsleri.siteadresi+"kayit&export=xml";
 
         Button btnUye=(Button) findViewById(R.id.btnUyeOl);
         btnUye.setOnClickListener(new View.OnClickListener() {
@@ -51,14 +49,6 @@ public class YeniUye extends Activity {
 
                                 if(response!=null)
                                 {
-                                    /*
-                                    *
-                                    * XML Sonuç Dönerse
-                                    *
-                                    * adres satırının sonuna ?xml=1 yazarak XML sonuç almayı başardım.
-                                    *
-                                    * ve bu sonucu XMLParse ile okuyarak, istediğim sonucu elde edebildim.
-                                     */
                                     XMLParse x=new XMLParse(response, XMLParse.XMLType.StringVar);
                                     if(x.getElementValue("sunucu_cevabi/0/code").equals("kayit_basarili")) {
                                         Log.i(ArkaplanIsleri.TAG_Response, "Kayıt Başarılı");
@@ -72,39 +62,6 @@ public class YeniUye extends Activity {
                                         Log.i(ArkaplanIsleri.TAG_Response, "Kayıt Başarısız");
                                         Toast.makeText(getBaseContext(),"Kayıt İşlemi başarısız oldu. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
                                     }
-                                    /*
-                                    *
-                                    *
-                                    *
-                                    * JSON Sonuç dönerse, ki döndü ama ben JSONArray a çeviremedim :D
-                                    *
-                                    *
-                                    *
-                                    //eğer sonuç olumlu ise anasayfaya geri dön.
-                                    try {
-                                        JSONObject object = new JSONObject(response);
-                                        JSONArray jsonArray = object.getJSONArray("sunucu_cevabi"); //ahanda burada hata verdi
-                                        JSONObject jsonObject = jsonArray.getJSONObject(0);
-                                        String code = jsonObject.getString("code");
-                                        String message = jsonObject.getString("message");
-                                        if(code.equals("kayit_basarili"))
-                                        {
-                                            Toast.makeText(getBaseContext(),"Kayıt İşlemi başarıyla tamamlandı. Şimdi oturum açabilirsiniz.",Toast.LENGTH_LONG).show();
-                                            Intent i=new Intent(YeniUye.this,MainActivity.class);
-                                            i.putExtra("kullanici",((EditText)findViewById(R.id.edtKullanici)).getText().toString());
-                                            i.putExtra("sifre",((EditText)findViewById(R.id.edtSifre1)).getText().toString());
-                                            setResult(1002,i);
-                                            finishActivity(1001);
-                                        }
-                                        else
-                                        {
-                                            Toast.makeText(getBaseContext(),"Kayıt İşlemi başarısız oldu. Lütfen daha sonra tekrar deneyiniz.",Toast.LENGTH_LONG).show();
-                                        }
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-*/
                                     finish();
                                 }
                             }

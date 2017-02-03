@@ -1,8 +1,7 @@
 package com.madlion.benimtercihim;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -50,7 +49,7 @@ public class SifreDegistir extends AppCompatActivity {
                     if(ys1.equals(ys2))
                     {
                         //şifreler aynı ise, şifre değiştirme isteği gönder.
-                        StringRequest stringRequest = new StringRequest(Request.Method.POST, Genel_Islemler.siteadresi+"sifredegistir.php",
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST, ArkaplanIsleri.siteadresi+"sifredegistir.php",
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {

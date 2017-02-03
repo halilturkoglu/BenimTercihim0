@@ -39,6 +39,8 @@ public class ArkaplanIsleri extends AsyncTask<String,Void,String>{
     String response;
     public static String TAG_Response="Gelen Cevap";
     public static String TAG_Job="Yapılan İş";
+    public static String siteadresi="http://halilturkoglu.com/adem.php?page=";//"http://api.ademdeliaslan.com.tr/";
+
 
     public enum RequestType {
         POST,
@@ -87,7 +89,7 @@ public class ArkaplanIsleri extends AsyncTask<String,Void,String>{
 
     @Override
     protected String doInBackground(String ... params) {
-        Boolean isGet=params[0].equals("GET")?true:false;
+        Boolean isGet= params[0].equals("GET");
         //çağrılacak olan web sayfasının adresi
         String urlm=params[1];
 

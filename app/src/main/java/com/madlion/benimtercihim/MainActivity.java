@@ -1,36 +1,18 @@
 package com.madlion.benimtercihim;
 
 import android.content.Intent;
-import android.drm.DrmStore;
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -97,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(ArkaplanIsleri.TAG_Job,"Oturum Açma girişimi");
 
                 String[] params = new String[6];
-                params[0]=Genel_Islemler.siteadresi+"giris";
+                params[0]=ArkaplanIsleri.siteadresi+"giris";
                 params[1]="eposta";
                 params[2]=k.getText().toString();
                 params[3]="sifre";
@@ -111,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         JSONObject j=new JSONObject(r);
                         kid=j.getString("id");
-//                        JSONArray liste = new JSONObject(r).getJSONArray("bolumler");
-//                        JSONObject x;
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

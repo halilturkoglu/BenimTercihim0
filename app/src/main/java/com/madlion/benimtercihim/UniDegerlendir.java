@@ -1,32 +1,21 @@
 package com.madlion.benimtercihim;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UniDegerlendir extends AppCompatActivity {
 
@@ -51,7 +40,7 @@ public class UniDegerlendir extends AppCompatActivity {
 
         ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
         String[] params = new String[1];
-        params[0]=Genel_Islemler.siteadresi+"sehirler";
+        params[0]=ArkaplanIsleri.siteadresi+"sehirler";
         String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
         try {
             JSONArray liste = new JSONObject(r).getJSONArray("sehirler");
@@ -87,7 +76,7 @@ public class UniDegerlendir extends AppCompatActivity {
                 {
                     Toast.makeText(getBaseContext(),String.valueOf(position),Toast.LENGTH_LONG).show();
                     String[] params = new String[1];
-                    params[0]=Genel_Islemler.siteadresi+"universiteler&sehirid="+parent.getItemAtPosition(position).toString().split("-")[0];
+                    params[0]=ArkaplanIsleri.siteadresi+"universiteler&sehirid="+parent.getItemAtPosition(position).toString().split("-")[0];
                     ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
                     String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
                     try {
@@ -128,7 +117,7 @@ public class UniDegerlendir extends AppCompatActivity {
                 if(position>0)
                 {
                     String[] params = new String[1];
-                    params[0]=Genel_Islemler.siteadresi+"fakulteler&universiteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
+                    params[0]=ArkaplanIsleri.siteadresi+"fakulteler&universiteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
                     ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
                     String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
                     try {
@@ -170,7 +159,7 @@ public class UniDegerlendir extends AppCompatActivity {
                 if(position>0)
                 {
                     String[] params = new String[1];
-                    params[0]=Genel_Islemler.siteadresi+"bolumler&fakulteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
+                    params[0]=ArkaplanIsleri.siteadresi+"bolumler&fakulteid="+ parent.getItemAtPosition(position).toString().split("-")[0];
                     ArkaplanIsleri ai=new ArkaplanIsleri(getBaseContext(),UniDegerlendir.this);
                     String r=ai.getResponseFrom(params,ArkaplanIsleri.RequestType.GET);
                     try {
@@ -269,7 +258,7 @@ public class UniDegerlendir extends AppCompatActivity {
 
                 Log.i(ArkaplanIsleri.TAG_Job,shr+"-"+uni+"-"+fkl+"-"+blm);
                 String[] params=new String[27];
-                params[0]=Genel_Islemler.siteadresi+"degerlendir";
+                params[0]=ArkaplanIsleri.siteadresi+"degerlendir";
                 params[1]="uniid"; params[2]=uni;
                 params[3]="sehirkira"; params[4]= String.valueOf(rtKira);
                 params[5]="sehiryurt"; params[6]= String.valueOf(rtYurt);
